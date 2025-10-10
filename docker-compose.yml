@@ -1,0 +1,61 @@
+services:
+    # Laravel (PHP-FPM)
+    laravel:
+        container_name: pla_admin_laravel
+        build: ./docker/php
+        working_dir: /var/www/pinkladyafricaadmin
+        ports:
+            - "5173:5173" # Vite/NPM Port
+        volumes:
+            - ./:/var/www/pinkladyafricaadmin
+        depends_on:
+            - database
+        environment:
+            - "DB_PORT=3306"
+            - "DB_HOST=database"
+        restart: unless-stopped
+        networks:
+            - default
+
+    # Nginx
+    nginx:
+        container_name: pla_admin_nginx
+        build: ./docker/nginx
+        working_dir: /var/www/pinkladyafricaadmin
+        volumes:
+            - ./:/var/www/pinkladyafricaadmin
+        ports:
+            - "9625:80"      # <-- UPDATED
+            - "9651:443"     # <-- UPDATED
+        depends_on:
+            - laravel
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        restart: unless-stopped
+        networks:
+            - default
+
+    # MySQL Database
+    database:
+        container_name: pla_admin_mysql
+        build: ./docker/mysql # Build from Dockerfile to ensure DB is created
+        platform: linux/amd64
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: pla_admin_db
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+        ports:
+            - "36149:3306"
+        volumes:
+            - ./docker/mysql/db_volume_mount:/var/lib/mysql
+        restart: unless-stopped
+        networks:
+            - default
+
+networks:
+    default:
+        driver: bridge
