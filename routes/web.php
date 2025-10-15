@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Pages\AdminPageController;
 use App\Http\Controllers\PLAuthentication\UserRoleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,18 @@ Route::middleware(['auth', 'verified', 'role:webmaster'])->group(function () {
     Route::post('users', [UserRoleController::class, 'store'])->name('users.store');        // <-- Add this
     Route::get('users/{user}/edit', [UserRoleController::class, 'edit'])->name('users.edit');
     Route::put('users/{user}', [UserRoleController::class, 'update'])->name('users.update');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // ... (your user management routes)
+
+    // Group all page management routes under a country code prefix
+    Route::prefix('admin/{country_code}')
+        ->whereIn('country_code', ['ke', 'ng']) // Optional: Restricts to valid codes
+        ->name('admin.country.')
+        ->group(function () {
+            Route::resource('pages', AdminPageController::class);
+        });
 });
 
 require __DIR__.'/auth.php';
