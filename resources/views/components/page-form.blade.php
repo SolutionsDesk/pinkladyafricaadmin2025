@@ -13,7 +13,6 @@
     ])->sortBy(fn($value, $key) => $value)->toArray();
 @endphp
 
-{{-- Add Alpine variables for the new "Grown with Love" section --}}
 {{ html()->model($page)->form('POST', $action)->attributes(['x-data' => "pageForm({
     banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
     selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
@@ -21,6 +20,8 @@
     info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . ",
     info2BgPreview: null,
     info2BgExisting: " . json_encode($page->content['info_2_bg']['path'] ?? null) . ",
+    info3BgPreview: null,
+    info3BgExisting: " . json_encode($page->content['info_3_bg']['path'] ?? null) . ",
     grownImagePreview: null,
     grownImageExisting: " . json_encode($page->content['grown_image']['path'] ?? null) . ",
     image1Preview: null,
@@ -152,7 +153,6 @@
                     {{ html()->textarea('content[grown_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.grown_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
-
                 <div class="mt-6">
                     <h4 class="font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Feature Images</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -184,6 +184,29 @@
                             @error('content.image_3') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box 3</h3>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        <template x-if="info3BgExisting && !info3BgPreview"><img :src="'/storage/' + info3BgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="info3BgPreview"><img :src="info3BgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{ html()->file('content[info_3_bg]')->attributes(['@change' => 'setInfo3Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.info_3_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Title', 'content[info_3_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[info_3_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_3_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Content', 'content[info_3_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[info_3_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_3_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -223,6 +246,8 @@
             info1BgExisting: initialData.info1BgExisting,
             info2BgPreview: initialData.info2BgPreview,
             info2BgExisting: initialData.info2BgExisting,
+            info3BgPreview: initialData.info3BgPreview,
+            info3BgExisting: initialData.info3BgExisting,
             grownImagePreview: initialData.grownImagePreview,
             grownImageExisting: initialData.grownImageExisting,
             image1Preview: initialData.image1Preview,
@@ -246,6 +271,10 @@
             setInfo2Preview(event) {
                 const file = event.target.files[0];
                 if(file) { this.info2BgPreview = URL.createObjectURL(file); }
+            },
+            setInfo3Preview(event) {
+                const file = event.target.files[0];
+                if(file) { this.info3BgPreview = URL.createObjectURL(file); }
             },
             setGrownImagePreview(event) {
                 const file = event.target.files[0];

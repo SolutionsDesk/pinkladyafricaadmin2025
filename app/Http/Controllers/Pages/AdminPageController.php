@@ -39,23 +39,11 @@ class AdminPageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
-            'content' => 'nullable|array',
-            // Banner Validation
-            'content.banners' => 'nullable|array',
             'content.banners.*.image_url' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.banners.*.title' => 'nullable|string',
-            'content.banners.*.description' => 'nullable|string',
-            // Info Box 1 & 2 Validation
             'content.info_1_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_1_title' => 'required_if:template_name,home|string',
-            'content.info_1_content' => 'required_if:template_name,home|string',
             'content.info_2_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_2_title' => 'required_if:template_name,home|string',
-            'content.info_2_content' => 'required_if:template_name,home|string',
-            // "Grown with Love" validations (including the main image)
+            'content.info_3_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.grown_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.grown_title' => 'required_if:template_name,home|string',
-            'content.grown_content' => 'required_if:template_name,home|string',
             'content.image_1' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_2' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_3' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -74,8 +62,8 @@ class AdminPageController extends Controller
             }
         }
 
-        // Process all single image fields from Info Boxes and "Grown with Love"
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        // Process all single image fields
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
@@ -96,6 +84,7 @@ class AdminPageController extends Controller
     }
 
 
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -114,10 +103,10 @@ class AdminPageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
-            // All images are optional on update
             'content.banners.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_1_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_2_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.info_3_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.grown_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -144,7 +133,7 @@ class AdminPageController extends Controller
         }
 
         // Process all single image fields on update
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
