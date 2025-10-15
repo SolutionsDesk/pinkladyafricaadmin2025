@@ -13,14 +13,22 @@
     ])->sortBy(fn($value, $key) => $value)->toArray();
 @endphp
 
-{{-- Add Alpine variables for the second info box --}}
+{{-- Add Alpine variables for the new "Grown with Love" section --}}
 {{ html()->model($page)->form('POST', $action)->attributes(['x-data' => "pageForm({
     banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
     selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
     info1BgPreview: null,
     info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . ",
     info2BgPreview: null,
-    info2BgExisting: " . json_encode($page->content['info_2_bg']['path'] ?? null) . "
+    info2BgExisting: " . json_encode($page->content['info_2_bg']['path'] ?? null) . ",
+    grownImagePreview: null,
+    grownImageExisting: " . json_encode($page->content['grown_image']['path'] ?? null) . ",
+    image1Preview: null,
+    image1Existing: " . json_encode($page->content['image_1']['path'] ?? null) . ",
+    image2Preview: null,
+    image2Existing: " . json_encode($page->content['image_2']['path'] ?? null) . ",
+    image3Preview: null,
+    image3Existing: " . json_encode($page->content['image_3']['path'] ?? null) . "
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit) @method('PUT') @endif
@@ -123,6 +131,62 @@
                 </div>
             </div>
 
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">"Grown with Love" Section</h3>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        <template x-if="grownImageExisting && !grownImagePreview"><img :src="'/storage/' + grownImageExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="grownImagePreview"><img :src="grownImagePreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{ html()->file('content[grown_image]')->attributes(['@change' => 'setGrownImagePreview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.grown_image') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Title', 'content[grown_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[grown_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.grown_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Content', 'content[grown_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[grown_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.grown_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Feature Images</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-600 dark:text-gray-400">Packed with goodness</label>
+                            <div class="mt-1">
+                                <template x-if="image1Existing && !image1Preview"><img :src="'/storage/' + image1Existing" class="h-24 w-24 rounded-md object-cover"></template>
+                                <template x-if="image1Preview"><img :src="image1Preview" class="h-24 w-24 rounded-md object-cover"></template>
+                            </div>
+                            {{ html()->file('content[image_1]')->attributes(['@change' => 'setImage1Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                            @error('content.image_1') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 dark:text-gray-400">Healthy living</label>
+                            <div class="mt-1">
+                                <template x-if="image2Existing && !image2Preview"><img :src="'/storage/' + image2Existing" class="h-24 w-24 rounded-md object-cover"></template>
+                                <template x-if="image2Preview"><img :src="image2Preview" class="h-24 w-24 rounded-md object-cover"></template>
+                            </div>
+                            {{ html()->file('content[image_2]')->attributes(['@change' => 'setImage2Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                            @error('content.image_2') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 dark:text-gray-400">Competitions</label>
+                            <div class="mt-1">
+                                <template x-if="image3Existing && !image3Preview"><img :src="'/storage/' + image3Existing" class="h-24 w-24 rounded-md object-cover"></template>
+                                <template x-if="image3Preview"><img :src="image3Preview" class="h-24 w-24 rounded-md object-cover"></template>
+                            </div>
+                            {{ html()->file('content[image_3]')->attributes(['@change' => 'setImage3Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                            @error('content.image_3') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -159,6 +223,14 @@
             info1BgExisting: initialData.info1BgExisting,
             info2BgPreview: initialData.info2BgPreview,
             info2BgExisting: initialData.info2BgExisting,
+            grownImagePreview: initialData.grownImagePreview,
+            grownImageExisting: initialData.grownImageExisting,
+            image1Preview: initialData.image1Preview,
+            image1Existing: initialData.image1Existing,
+            image2Preview: initialData.image2Preview,
+            image2Existing: initialData.image2Existing,
+            image3Preview: initialData.image3Preview,
+            image3Existing: initialData.image3Existing,
 
             addBanner() {
                 this.banners.push({ image_url: '', title: '', description: '', new_image_preview: null });
@@ -174,7 +246,23 @@
             setInfo2Preview(event) {
                 const file = event.target.files[0];
                 if(file) { this.info2BgPreview = URL.createObjectURL(file); }
-            }
+            },
+            setGrownImagePreview(event) {
+                const file = event.target.files[0];
+                if(file) { this.grownImagePreview = URL.createObjectURL(file); }
+            },
+            setImage1Preview(event) {
+                const file = event.target.files[0];
+                if(file) { this.image1Preview = URL.createObjectURL(file); }
+            },
+            setImage2Preview(event) {
+                const file = event.target.files[0];
+                if(file) { this.image2Preview = URL.createObjectURL(file); }
+            },
+            setImage3Preview(event) {
+                const file = event.target.files[0];
+                if(file) { this.image3Preview = URL.createObjectURL(file); }
+            },
         }));
     });
 </script>

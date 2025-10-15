@@ -45,14 +45,20 @@ class AdminPageController extends Controller
             'content.banners.*.image_url' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.banners.*.title' => 'nullable|string',
             'content.banners.*.description' => 'nullable|string',
-            // Info Box 1 Validation
+            // Info Box 1 & 2 Validation
             'content.info_1_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_1_title' => 'required_if:template_name,home|string',
             'content.info_1_content' => 'required_if:template_name,home|string',
-            // Info Box 2 Validation
             'content.info_2_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_2_title' => 'required_if:template_name,home|string',
             'content.info_2_content' => 'required_if:template_name,home|string',
+            // "Grown with Love" validations (including the main image)
+            'content.grown_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.grown_title' => 'required_if:template_name,home|string',
+            'content.grown_content' => 'required_if:template_name,home|string',
+            'content.image_1' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.image_2' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.image_3' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $content = $request->input('content', []);
@@ -68,18 +74,14 @@ class AdminPageController extends Controller
             }
         }
 
-        // Process Homepage Info Box 1 Image
-        if ($request->hasFile('content.info_1_bg')) {
-            $file = $request->file('content.info_1_bg');
-            $path = $file->store('uploads/infobox', 'public');
-            $content['info_1_bg'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
-        }
-
-        // Process Homepage Info Box 2 Image
-        if ($request->hasFile('content.info_2_bg')) {
-            $file = $request->file('content.info_2_bg');
-            $path = $file->store('uploads/infobox', 'public');
-            $content['info_2_bg'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+        // Process all single image fields from Info Boxes and "Grown with Love"
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        foreach ($singleImageFields as $field) {
+            if ($request->hasFile("content.{$field}")) {
+                $file = $request->file("content.{$field}");
+                $path = $file->store('uploads/homepage', 'public');
+                $content[$field] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+            }
         }
 
         Pages::create([
@@ -112,16 +114,20 @@ class AdminPageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
-            'content' => 'nullable|array',
+            // All images are optional on update
             'content.banners.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_1_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_2_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.grown_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $newContent = $request->input('content', []);
         $originalContent = $page->content ?? [];
 
-        // Process Banner Repeater Images on Update
+        // Process Banner Repeater Images
         if (isset($newContent['banners'])) {
             foreach ($newContent['banners'] as $index => &$bannerData) {
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
@@ -137,28 +143,19 @@ class AdminPageController extends Controller
             }
         }
 
-        // Process Homepage Info Box 1 Image on Update
-        if ($request->hasFile('content.info_1_bg')) {
-            $file = $request->file('content.info_1_bg');
-            $path = $file->store('uploads/infobox', 'public');
-            if (isset($originalContent['info_1_bg']['path'])) {
-                Storage::disk('public')->delete($originalContent['info_1_bg']['path']);
+        // Process all single image fields on update
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        foreach ($singleImageFields as $field) {
+            if ($request->hasFile("content.{$field}")) {
+                $file = $request->file("content.{$field}");
+                $path = $file->store('uploads/homepage', 'public');
+                if (isset($originalContent[$field]['path'])) {
+                    Storage::disk('public')->delete($originalContent[$field]['path']);
+                }
+                $newContent[$field] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+            } else {
+                $newContent[$field] = $originalContent[$field] ?? null;
             }
-            $newContent['info_1_bg'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
-        } else {
-            $newContent['info_1_bg'] = $originalContent['info_1_bg'] ?? null;
-        }
-
-        // Process Homepage Info Box 2 Image on Update
-        if ($request->hasFile('content.info_2_bg')) {
-            $file = $request->file('content.info_2_bg');
-            $path = $file->store('uploads/infobox', 'public');
-            if (isset($originalContent['info_2_bg']['path'])) {
-                Storage::disk('public')->delete($originalContent['info_2_bg']['path']);
-            }
-            $newContent['info_2_bg'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
-        } else {
-            $newContent['info_2_bg'] = $originalContent['info_2_bg'] ?? null;
         }
 
         // Cleanup orphaned banner images
