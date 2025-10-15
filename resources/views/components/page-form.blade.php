@@ -3,21 +3,24 @@
 @php
     $isEdit = isset($page);
     $action = $isEdit
-    ? route('admin.country.pages.update', ['country_code' => $country_code, 'page' => $page])
-    : route('admin.country.pages.store', $country_code);
+        ? route('admin.country.pages.update', ['country_code' => $country_code, 'page' => $page])
+        : route('admin.country.pages.store', $country_code);
 
     $templates = collect([
-    'default' => 'Default Template', 'home' => 'Homepage', 'contact' => 'Contact',
-    'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
-    'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
+        'default' => 'Default Template', 'home' => 'Homepage', 'contact' => 'Contact',
+        'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
+        'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
     ])->sortBy(fn($value, $key) => $value)->toArray();
 @endphp
 
+{{-- Add Alpine variables for the second info box --}}
 {{ html()->model($page)->form('POST', $action)->attributes(['x-data' => "pageForm({
-banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
-selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
-info1BgPreview: null,
-info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . "
+    banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
+    selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
+    info1BgPreview: null,
+    info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . ",
+    info2BgPreview: null,
+    info2BgExisting: " . json_encode($page->content['info_2_bg']['path'] ?? null) . "
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit) @method('PUT') @endif
@@ -73,33 +76,53 @@ info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . 
         </div>
 
         <div x-show="selectedTemplate === 'home'" x-transition class="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box</h3>
-            <div>
-                <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Info Box Background Image</label>
-                <div class="mt-2">
-                    <template x-if="info1BgExisting && !info1BgPreview">
-                        <img :src="'/storage/' + info1BgExisting" class="h-24 w-auto rounded-md object-cover">
-                    </template>
-                    <template x-if="info1BgPreview">
-                        <img :src="info1BgPreview" class="h-24 w-auto rounded-md object-cover">
-                    </template>
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box 1</h3>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        <template x-if="info1BgExisting && !info1BgPreview"><img :src="'/storage/' + info1BgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="info1BgPreview"><img :src="info1BgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{ html()->file('content[info_1_bg]')->attributes(['@change' => 'setInfo1Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.info_1_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
-                {{-- Match the file input styling --}}
-                {{ html()->file('content[info_1_bg]')->attributes(['@change' => 'setInfo1Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
-                @error('content.info_1_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                <div>
+                    {{ html()->label('Title', 'content[info_1_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[info_1_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_1_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Content', 'content[info_1_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[info_1_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_1_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
             </div>
-            <div>
-                {{ html()->label('Info Box Title', 'content[info_1_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                {{-- Match the text input styling --}}
-                {{ html()->text('content[info_1_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
-                @error('content.info_1_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box 2</h3>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        <template x-if="info2BgExisting && !info2BgPreview"><img :src="'/storage/' + info2BgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="info2BgPreview"><img :src="info2BgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{ html()->file('content[info_2_bg]')->attributes(['@change' => 'setInfo2Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.info_2_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Title', 'content[info_2_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[info_2_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_2_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Content', 'content[info_2_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[info_2_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_2_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
             </div>
-            <div>
-                {{ html()->label('Info Box Content', 'content[info_1_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                {{-- Match the textarea styling --}}
-                {{ html()->textarea('content[info_1_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
-                @error('content.info_1_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
-            </div>
+
         </div>
     </div>
 
@@ -134,20 +157,23 @@ info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . 
             selectedTemplate: initialData.selectedTemplate,
             info1BgPreview: initialData.info1BgPreview,
             info1BgExisting: initialData.info1BgExisting,
+            info2BgPreview: initialData.info2BgPreview,
+            info2BgExisting: initialData.info2BgExisting,
+
             addBanner() {
                 this.banners.push({ image_url: '', title: '', description: '', new_image_preview: null });
             },
             setPreview(event, index) {
                 const file = event.target.files[0];
-                if (file) {
-                    this.banners[index].new_image_preview = URL.createObjectURL(file);
-                }
+                if (file) { this.banners[index].new_image_preview = URL.createObjectURL(file); }
             },
             setInfo1Preview(event) {
                 const file = event.target.files[0];
-                if(file) {
-                    this.info1BgPreview = URL.createObjectURL(file);
-                }
+                if(file) { this.info1BgPreview = URL.createObjectURL(file); }
+            },
+            setInfo2Preview(event) {
+                const file = event.target.files[0];
+                if(file) { this.info2BgPreview = URL.createObjectURL(file); }
             }
         }));
     });
