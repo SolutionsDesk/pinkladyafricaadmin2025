@@ -3,22 +3,21 @@
 @php
     $isEdit = isset($page);
     $action = $isEdit
-        ? route('admin.country.pages.update', ['country_code' => $country_code, 'page' => $page])
-        : route('admin.country.pages.store', $country_code);
+    ? route('admin.country.pages.update', ['country_code' => $country_code, 'page' => $page])
+    : route('admin.country.pages.store', $country_code);
 
-    $templates = [
-        'default' => 'Default Template', 'home' => 'Homepage', 'contact' => 'Contact',
-        'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
-        'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
-    ];
-    asort($templates);
+    $templates = collect([
+    'default' => 'Default Template', 'home' => 'Homepage', 'contact' => 'Contact',
+    'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
+    'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
+    ])->sortBy(fn($value, $key) => $value)->toArray();
 @endphp
 
 {{ html()->model($page)->form('POST', $action)->attributes(['x-data' => "pageForm({
-    banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
-    selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
-    info1BgPreview: null,
-    info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . "
+banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
+selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
+info1BgPreview: null,
+info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . "
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit) @method('PUT') @endif

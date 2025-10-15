@@ -16,7 +16,7 @@ class AdminPageController extends Controller
      */
     public function index(string $country_code)
     {
-        // The Global Scope automatically filters this based on the URL!
+// The Global Scope automatically filters this based on the URL!
         $pages = Pages::latest()->get();
         return view('admin.pages.index', compact('pages', 'country_code'));
     }
@@ -51,10 +51,10 @@ class AdminPageController extends Controller
 
         $content = $request->input('content', []);
 
-        // **1. Process Banner Repeater Images**
+// **1. Process Banner Repeater Images**
         if (isset($content['banners'])) {
             foreach ($content['banners'] as $index => &$bannerData) {
-                // The CORRECT check for each file in the array
+// The CORRECT check for each file in the array
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
                     $file = $request->file("content.banners.{$index}.image_url");
                     $path = $file->store('uploads/banners', 'public');
@@ -63,7 +63,7 @@ class AdminPageController extends Controller
             }
         }
 
-        // **2. Process Homepage Info Box Image**
+// **2. Process Homepage Info Box Image**
         if ($request->hasFile('content.info_1_bg')) {
             $file = $request->file('content.info_1_bg');
             $path = $file->store('uploads/infobox', 'public');
@@ -113,7 +113,7 @@ class AdminPageController extends Controller
         $newContent = $request->input('content', []);
         $originalContent = $page->content ?? [];
 
-        // **1. Process Banner Repeater Images on Update**
+// **1. Process Banner Repeater Images on Update**
         if (isset($newContent['banners'])) {
             foreach ($newContent['banners'] as $index => &$bannerData) {
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
@@ -129,7 +129,7 @@ class AdminPageController extends Controller
             }
         }
 
-        // **2. Process Homepage Info Box Image on Update**
+// **2. Process Homepage Info Box Image on Update**
         if ($request->hasFile('content.info_1_bg')) {
             $file = $request->file('content.info_1_bg');
             $path = $file->store('uploads/infobox', 'public');
@@ -141,7 +141,7 @@ class AdminPageController extends Controller
             $newContent['info_1_bg'] = $originalContent['info_1_bg'] ?? null;
         }
 
-        // Cleanup orphaned banner images
+// Cleanup orphaned banner images
         $originalImagePaths = collect($originalContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $finalImagePaths = collect($newContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $imagesToDelete = $originalImagePaths->diff($finalImagePaths);
@@ -162,7 +162,7 @@ class AdminPageController extends Controller
      */
     public function destroy(string $country_code, Pages $page)
     {
-        // Authorize the action using the policy
+// Authorize the action using the policy
         $this->authorize('delete', $page);
 
         $page->delete();
