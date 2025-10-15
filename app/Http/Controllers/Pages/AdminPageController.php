@@ -40,12 +40,10 @@ class AdminPageController extends Controller
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
             'content' => 'nullable|array',
-            // Banner Validation
             'content.banners' => 'nullable|array',
             'content.banners.*.image_url' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.banners.*.title' => 'nullable|string',
             'content.banners.*.description' => 'nullable|string',
-            // Homepage Info Box Validation (required only if template is 'home')
             'content.info_1_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_1_title' => 'required_if:template_name,home|string',
             'content.info_1_content' => 'required_if:template_name,home|string',
@@ -53,18 +51,19 @@ class AdminPageController extends Controller
 
         $content = $request->input('content', []);
 
-        // Process Banner Images
-        if ($request->hasFile('content.banners')) {
-            foreach ($request->file('content.banners') as $index => $fileData) {
-                if (isset($fileData['image_url'])) {
-                    $file = $fileData['image_url'];
+        // **1. Process Banner Repeater Images**
+        if (isset($content['banners'])) {
+            foreach ($content['banners'] as $index => &$bannerData) {
+                // The CORRECT check for each file in the array
+                if ($request->hasFile("content.banners.{$index}.image_url")) {
+                    $file = $request->file("content.banners.{$index}.image_url");
                     $path = $file->store('uploads/banners', 'public');
-                    $content['banners'][$index]['image_url'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+                    $bannerData['image_url'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
                 }
             }
         }
 
-        // Process Homepage Info Box Image
+        // **2. Process Homepage Info Box Image**
         if ($request->hasFile('content.info_1_bg')) {
             $file = $request->file('content.info_1_bg');
             $path = $file->store('uploads/infobox', 'public');
@@ -81,7 +80,6 @@ class AdminPageController extends Controller
         return redirect()->route('admin.country.pages.index', $country_code)
             ->with('success', 'Page created successfully.');
     }
-
 
 
     /**
@@ -115,22 +113,39 @@ class AdminPageController extends Controller
         $newContent = $request->input('content', []);
         $originalContent = $page->content ?? [];
 
-        // ... (Your existing banner update logic remains here) ...
+        // **1. Process Banner Repeater Images on Update**
+        if (isset($newContent['banners'])) {
+            foreach ($newContent['banners'] as $index => &$bannerData) {
+                if ($request->hasFile("content.banners.{$index}.image_url")) {
+                    $file = $request->file("content.banners.{$index}.image_url");
+                    $path = $file->store('uploads/banners', 'public');
+                    if (isset($originalContent['banners'][$index]['image_url']['path'])) {
+                        Storage::disk('public')->delete($originalContent['banners'][$index]['image_url']['path']);
+                    }
+                    $bannerData['image_url'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+                } else {
+                    $bannerData['image_url'] = $originalContent['banners'][$index]['image_url'] ?? null;
+                }
+            }
+        }
 
-        // Process Homepage Info Box Image on update
+        // **2. Process Homepage Info Box Image on Update**
         if ($request->hasFile('content.info_1_bg')) {
             $file = $request->file('content.info_1_bg');
             $path = $file->store('uploads/infobox', 'public');
-
-            // Delete old image if it exists
             if (isset($originalContent['info_1_bg']['path'])) {
                 Storage::disk('public')->delete($originalContent['info_1_bg']['path']);
             }
             $newContent['info_1_bg'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
         } else {
-            // Keep existing image if no new one is uploaded
             $newContent['info_1_bg'] = $originalContent['info_1_bg'] ?? null;
         }
+
+        // Cleanup orphaned banner images
+        $originalImagePaths = collect($originalContent['banners'] ?? [])->pluck('image_url.path')->filter();
+        $finalImagePaths = collect($newContent['banners'] ?? [])->pluck('image_url.path')->filter();
+        $imagesToDelete = $originalImagePaths->diff($finalImagePaths);
+        Storage::disk('public')->delete($imagesToDelete->all());
 
         $page->update([
             'title' => $validated['title'],
