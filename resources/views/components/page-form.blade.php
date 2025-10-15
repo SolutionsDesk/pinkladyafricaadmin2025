@@ -29,7 +29,9 @@
     image2Preview: null,
     image2Existing: " . json_encode($page->content['image_2']['path'] ?? null) . ",
     image3Preview: null,
-    image3Existing: " . json_encode($page->content['image_3']['path'] ?? null) . "
+    image3Existing: " . json_encode($page->content['image_3']['path'] ?? null) . ",
+    recipeBgPreview: null,
+    recipeBgExisting: " . json_encode($page->content['recipe_bg_image']['path'] ?? null) . "
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit) @method('PUT') @endif
@@ -133,6 +135,29 @@
             </div>
 
             <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box 3</h3>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        <template x-if="info3BgExisting && !info3BgPreview"><img :src="'/storage/' + info3BgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="info3BgPreview"><img :src="info3BgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{ html()->file('content[info_3_bg]')->attributes(['@change' => 'setInfo3Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.info_3_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Title', 'content[info_3_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[info_3_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_3_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{ html()->label('Content', 'content[info_3_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[info_3_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.info_3_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">"Grown with Love" Section</h3>
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
@@ -188,25 +213,25 @@
             </div>
 
             <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Homepage Info Box 3</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Recipes Section</h3>
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="info3BgExisting && !info3BgPreview"><img :src="'/storage/' + info3BgExisting" class="h-24 w-auto rounded-md object-cover"></template>
-                        <template x-if="info3BgPreview"><img :src="info3BgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="recipeBgExisting && !recipeBgPreview"><img :src="'/storage/' + recipeBgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="recipeBgPreview"><img :src="recipeBgPreview" class="h-24 w-auto rounded-md object-cover"></template>
                     </div>
-                    {{ html()->file('content[info_3_bg]')->attributes(['@change' => 'setInfo3Preview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
-                    @error('content.info_3_bg') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                    {{ html()->file('content[recipe_bg_image]')->attributes(['@change' => 'setRecipePreview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.recipe_bg_image') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    {{ html()->label('Title', 'content[info_3_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->text('content[info_3_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
-                    @error('content.info_3_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                    {{ html()->label('Title', 'content[recipe_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[recipe_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.recipe_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    {{ html()->label('Content', 'content[info_3_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[info_3_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
-                    @error('content.info_3_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                    {{ html()->label('Content', 'content[recipe_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[recipe_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.recipe_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -256,6 +281,8 @@
             image2Existing: initialData.image2Existing,
             image3Preview: initialData.image3Preview,
             image3Existing: initialData.image3Existing,
+            recipeBgPreview: initialData.recipeBgPreview,
+            recipeBgExisting: initialData.recipeBgExisting,
 
             addBanner() {
                 this.banners.push({ image_url: '', title: '', description: '', new_image_preview: null });
@@ -291,6 +318,10 @@
             setImage3Preview(event) {
                 const file = event.target.files[0];
                 if(file) { this.image3Preview = URL.createObjectURL(file); }
+            },
+            setRecipePreview(event) {
+                const file = event.target.files[0];
+                if(file) { this.recipeBgPreview = URL.createObjectURL(file); }
             },
         }));
     });

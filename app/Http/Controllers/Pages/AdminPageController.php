@@ -47,6 +47,9 @@ class AdminPageController extends Controller
             'content.image_1' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_2' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_3' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.recipe_bg_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.recipe_title' => 'required_if:template_name,home|string',
+            'content.recipe_content' => 'required_if:template_name,home|string',
         ]);
 
         $content = $request->input('content', []);
@@ -63,7 +66,7 @@ class AdminPageController extends Controller
         }
 
         // Process all single image fields
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3', 'recipe_bg_image'];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
@@ -82,8 +85,6 @@ class AdminPageController extends Controller
         return redirect()->route('admin.country.pages.index', $country_code)
             ->with('success', 'Page created successfully.');
     }
-
-
 
     /**
      * Show the form for editing the specified resource.
@@ -111,6 +112,7 @@ class AdminPageController extends Controller
             'content.image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.recipe_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $newContent = $request->input('content', []);
@@ -133,7 +135,7 @@ class AdminPageController extends Controller
         }
 
         // Process all single image fields on update
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3'];
+        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3', 'recipe_bg_image'];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
