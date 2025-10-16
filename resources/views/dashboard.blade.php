@@ -13,31 +13,58 @@
                         Content Management
                     </h3>
 
-                    <div class="mt-6 space-y-4">
+                    <div class="mt-6 space-y-6">
                         @auth
-                            {{-- Webmaster sees links to all country admin areas --}}
+                            {{-- Webmaster sees links for all countries, grouped in boxes --}}
                             @if(auth()->user()->hasRole('webmaster'))
-                                <a href="{{ route('admin.country.pages.index', ['country_code' => 'ke']) }}"
-                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
-                                    → Manage Kenya Pages
-                                </a>
-                                <a href="{{ route('admin.country.pages.index', ['country_code' => 'ng']) }}"
-                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
-                                    → Manage Nigeria Pages
-                                </a>
+                                <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border dark:border-gray-600">
+                                    <h4 class="font-bold text-lg">Kenya</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <a href="{{ route('admin.country.pages.index', ['country_code' => 'ke']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Pages
+                                        </a>
+                                        <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ke']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Site Settings
+                                        </a>
+                                    </div>
+                                </div>
 
-                                {{-- Kenyan editors only see the link to the Kenya admin area --}}
+                                <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border dark:border-gray-600">
+                                    <h4 class="font-bold text-lg">Nigeria</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <a href="{{ route('admin.country.pages.index', ['country_code' => 'ng']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Pages
+                                        </a>
+                                        <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ng']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Site Settings
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {{-- Kenyan editors only see their links --}}
                             @elseif(auth()->user()->hasRole('pl-kenya'))
                                 <a href="{{ route('admin.country.pages.index', ['country_code' => 'ke']) }}"
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
-                                    → Manage Kenya Pages
+                                    → Manage Pages
+                                </a>
+                                <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ke']) }}"
+                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                    → Manage Site Settings
                                 </a>
 
-                                {{-- Nigerian editors only see the link to the Nigeria admin area --}}
+                                {{-- Nigerian editors only see their links --}}
                             @elseif(auth()->user()->hasRole('pl-nigeria'))
                                 <a href="{{ route('admin.country.pages.index', ['country_code' => 'ng']) }}"
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
-                                    → Manage Nigeria Pages
+                                    → Manage Pages
+                                </a>
+                                <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ng']) }}"
+                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                    → Manage Site Settings
                                 </a>
                             @endif
                         @endauth

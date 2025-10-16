@@ -4,8 +4,10 @@ namespace App\Providers;
 
 // Import your custom model and policy
 use App\Models\Countries\Pages;
+use App\Models\Settings\SiteSetting;
 use App\Policies\PagePolicy;
 // IMPORTANT: Change the base class it extends
+use App\Policies\SiteSettingPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         // Add your mapping here
         Pages::class => PagePolicy::class,
+        SiteSetting::class => SiteSettingPolicy::class,
     ];
 
     /**
