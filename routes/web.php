@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\HealthyLiving\HealthyLivingController;
 use App\Http\Controllers\Pages\AdminPageController;
 use App\Http\Controllers\PLAuthentication\UserRoleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Recipes\RecipeController;
 use App\Http\Controllers\Settings\SiteSettingController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +49,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.country.')
         ->group(function () {
             Route::resource('pages', AdminPageController::class);
+            // Healthy Living
+            Route::resource('healthy-living', HealthyLivingController::class);
+            // Recipes
+            Route::resource('recipes', RecipeController::class);
             // Site Settings
             Route::get('settings', [SiteSettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');
