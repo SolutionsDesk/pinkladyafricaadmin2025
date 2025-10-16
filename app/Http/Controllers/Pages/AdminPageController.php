@@ -39,7 +39,9 @@ class AdminPageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
-            'content.banners.*.image_url' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            // Banner Validation
+            'content.banners.*.image_url' => 'required_unless:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            // Homepage Validations
             'content.info_1_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_2_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_3_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -48,8 +50,15 @@ class AdminPageController extends Controller
             'content.image_2' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_3' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.recipe_bg_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.recipe_title' => 'required_if:template_name,home|string',
-            'content.recipe_content' => 'required_if:template_name,home|string',
+            // "Our Story" Validations
+            'content.birth_bg_image' => 'required_if:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.birth_title' => 'required_if:template_name,story|string',
+            'content.birth_content' => 'required_if:template_name,story|string',
+            'content.goodness_bg_image' => 'required_if:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.goodness_title' => 'required_if:template_name,story|string',
+            'content.goodness_content' => 'required_if:template_name,story|string',
+            'content.goodness_list' => 'nullable|array',
+            'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
         ]);
 
         $content = $request->input('content', []);
@@ -66,11 +75,16 @@ class AdminPageController extends Controller
         }
 
         // Process all single image fields
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3', 'recipe_bg_image'];
+        $singleImageFields = [
+            'info_1_bg', 'info_2_bg', 'info_3_bg',
+            'grown_image', 'image_1', 'image_2', 'image_3',
+            'recipe_bg_image',
+            'birth_bg_image', 'goodness_bg_image'
+        ];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
-                $path = $file->store('uploads/homepage', 'public');
+                $path = $file->store('uploads/pages', 'public');
                 $content[$field] = ['path' => $path, 'name' => $file->getClientOriginalName()];
             }
         }
@@ -104,6 +118,7 @@ class AdminPageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template_name' => 'required|string',
+            // All images are optional on update
             'content.banners.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_1_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.info_2_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -113,6 +128,10 @@ class AdminPageController extends Controller
             'content.image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'content.recipe_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.birth_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.goodness_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.goodness_list' => 'nullable|array',
+            'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
         ]);
 
         $newContent = $request->input('content', []);
@@ -135,11 +154,16 @@ class AdminPageController extends Controller
         }
 
         // Process all single image fields on update
-        $singleImageFields = ['info_1_bg', 'info_2_bg', 'info_3_bg', 'grown_image', 'image_1', 'image_2', 'image_3', 'recipe_bg_image'];
+        $singleImageFields = [
+            'info_1_bg', 'info_2_bg', 'info_3_bg',
+            'grown_image', 'image_1', 'image_2', 'image_3',
+            'recipe_bg_image',
+            'birth_bg_image', 'goodness_bg_image'
+        ];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
-                $path = $file->store('uploads/homepage', 'public');
+                $path = $file->store('uploads/pages', 'public');
                 if (isset($originalContent[$field]['path'])) {
                     Storage::disk('public')->delete($originalContent[$field]['path']);
                 }
