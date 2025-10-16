@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 // Import your custom model and policy
+use App\Models\Competitions\Competition;
 use App\Models\Countries\Pages;
 use App\Models\HealthyLiving\HealthyLiving;
 use App\Models\Recipes\Recipe;
 use App\Models\Settings\SiteSetting;
+use App\Policies\CompetitionPolicy;
 use App\Policies\HealthyLivingPolicy;
 use App\Policies\PagePolicy;
 // IMPORTANT: Change the base class it extends
@@ -27,6 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         SiteSetting::class => SiteSettingPolicy::class,
         HealthyLiving::class => HealthyLivingPolicy::class,
         Recipe::class => RecipePolicy::class,
+        Competition::class => CompetitionPolicy::class,
     ];
 
     /**

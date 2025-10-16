@@ -42,6 +42,10 @@
                                            class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                             → Manage Healthy Living
                                         </a>
+                                        <a href="{{ route('admin.country.competitions.index', ['country_code' => 'ke']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Competitions
+                                        </a>
                                         <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ke']) }}"
                                            class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                             → Manage Site Settings
@@ -64,6 +68,10 @@
                                            class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                             → Manage Healthy Living
                                         </a>
+                                        <a href="{{ route('admin.country.competitions.index', ['country_code' => 'ng']) }}"
+                                           class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                            → Manage Competitions
+                                        </a>
                                         <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ng']) }}"
                                            class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                             → Manage Site Settings
@@ -85,6 +93,10 @@
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                     → Manage Healthy Living
                                 </a>
+                                <a href="{{ route('admin.country.competitions.index', ['country_code' => 'ke']) }}"
+                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                    → Manage Competitions
+                                </a>
                                 <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ke']) }}"
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                     → Manage Site Settings
@@ -103,6 +115,10 @@
                                 <a href="{{ route('admin.country.healthy-living.index', ['country_code' => 'ng']) }}"
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
                                     → Manage Healthy Living
+                                </a>
+                                <a href="{{ route('admin.country.competitions.index', ['country_code' => 'ng']) }}"
+                                   class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">
+                                    → Manage Competitions
                                 </a>
                                 <a href="{{ route('admin.country.settings.edit', ['country_code' => 'ng']) }}"
                                    class="block font-semibold text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-100">

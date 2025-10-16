@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Competitions\CompetitionController;
 use App\Http\Controllers\HealthyLiving\HealthyLivingController;
 use App\Http\Controllers\Pages\AdminPageController;
 use App\Http\Controllers\PLAuthentication\UserRoleController;
@@ -53,6 +54,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('healthy-living', HealthyLivingController::class);
             // Recipes
             Route::resource('recipes', RecipeController::class);
+            // Competitions
+            Route::resource('competitions', CompetitionController::class);
             // Site Settings
             Route::get('settings', [SiteSettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');
