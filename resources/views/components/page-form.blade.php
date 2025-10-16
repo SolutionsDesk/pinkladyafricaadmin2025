@@ -52,7 +52,7 @@
             @error('title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
         </div>
 
-        <div x-show="selectedTemplate !== 'story'">
+        <div x-show="!['story', 'retailers', 'suppliers', 'find'].includes(selectedTemplate)">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Banners</h3>
             <div class="space-y-4">
                 <template x-for="(banner, index) in banners" :key="index">
