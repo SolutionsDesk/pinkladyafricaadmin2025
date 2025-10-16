@@ -6,60 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Countries\Pages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules;
 
 class AdminPageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(string $country_code)
     {
-// The Global Scope automatically filters this based on the URL!
         $pages = Pages::latest()->get();
         return view('admin.pages.index', compact('pages', 'country_code'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(string $country_code)
     {
         return view('admin.pages.create', compact('country_code'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, string $country_code)
     {
         $this->authorize('createForCountry', [Pages::class, $country_code]);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'template_name' => 'required|string',
-            // Banner Validation
-            'content.banners.*.image_url' => 'required_unless:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            // Homepage Validations
-            'content.info_1_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_2_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_3_bg' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.grown_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_1' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_2' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_3' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.recipe_bg_image' => 'required_if:template_name,home|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            // "Our Story" Validations
-            'content.birth_bg_image' => 'required_if:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.birth_title' => 'required_if:template_name,story|string',
-            'content.birth_content' => 'required_if:template_name,story|string',
-            'content.goodness_bg_image' => 'required_if:template_name,story|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.goodness_title' => 'required_if:template_name,story|string',
-            'content.goodness_content' => 'required_if:template_name,story|string',
-            'content.goodness_list' => 'nullable|array',
-            'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
-        ]);
+        $rules = $this->getValidationRules($request->input('template_name'));
+        $validated = $request->validate($rules);
 
         $content = $request->input('content', []);
 
@@ -100,39 +66,17 @@ class AdminPageController extends Controller
             ->with('success', 'Page created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $country_code, Pages $page)
     {
         return view('admin.pages.edit', compact('page', 'country_code'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $country_code, Pages $page)
     {
         $this->authorize('update', $page);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'template_name' => 'required|string',
-            // All images are optional on update
-            'content.banners.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_1_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_2_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.info_3_bg' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.grown_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.recipe_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.birth_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.goodness_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'content.goodness_list' => 'nullable|array',
-            'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
-        ]);
+        $rules = $this->getValidationRules($request->input('template_name'), true);
+        $validated = $request->validate($rules);
 
         $newContent = $request->input('content', []);
         $originalContent = $page->content ?? [];
@@ -189,17 +133,68 @@ class AdminPageController extends Controller
             ->with('success', 'Page updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $country_code, Pages $page)
     {
-// Authorize the action using the policy
         $this->authorize('delete', $page);
-
         $page->delete();
-
         return redirect()->route('admin.country.pages.index', $country_code)
             ->with('success', 'Page deleted successfully.');
+    }
+
+    /**
+     * Build and return validation rules based on the selected template.
+     */
+    private function getValidationRules(string $templateName, bool $isUpdate = false): array
+    {
+        $baseRules = [
+            'title' => 'required|string|max:255',
+            'template_name' => 'required|string',
+            'content' => 'nullable|array',
+        ];
+
+        $templateRules = [];
+
+        if ($templateName === 'home') {
+            $imageRule = 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048';
+            $templateRules = [
+                'content.banners' => 'nullable|array',
+                'content.banners.*.image_url' => $imageRule,
+                'content.banners.*.title' => 'nullable|string',
+                'content.banners.*.description' => 'nullable|string',
+                'content.info_1_bg' => $imageRule,
+                'content.info_1_title' => 'nullable|string',
+                'content.info_1_content' => 'nullable|string',
+                'content.info_2_bg' => $imageRule,
+                'content.info_2_title' => 'nullable|string',
+                'content.info_2_content' => 'nullable|string',
+                'content.info_3_bg' => $imageRule,
+                'content.info_3_title' => 'nullable|string',
+                'content.info_3_content' => 'nullable|string',
+                'content.grown_image' => $imageRule,
+                'content.grown_title' => 'nullable|string',
+                'content.grown_content' => 'nullable|string',
+                'content.image_1' => $imageRule,
+                'content.image_2' => $imageRule,
+                'content.image_3' => $imageRule,
+                'content.recipe_bg_image' => $imageRule,
+                'content.recipe_title' => 'nullable|string',
+                'content.recipe_content' => 'nullable|string',
+            ];
+        }
+        elseif ($templateName === 'story') {
+            $imageRule = $isUpdate ? 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' : 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048';
+            $templateRules = [
+                'content.birth_bg_image' => $imageRule,
+                'content.birth_title' => 'required|string',
+                'content.birth_content' => 'required|string',
+                'content.goodness_bg_image' => $imageRule,
+                'content.goodness_title' => 'required|string',
+                'content.goodness_content' => 'required|string',
+                'content.goodness_list' => 'nullable|array',
+                'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
+            ];
+        }
+
+        return array_merge($baseRules, $templateRules);
     }
 }

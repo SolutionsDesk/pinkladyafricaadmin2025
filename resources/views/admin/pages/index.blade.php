@@ -12,7 +12,7 @@
 
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-2xl font-semibold">Page List</h3>
+                            <h3 class="text-2xl font-semibold">Page List ({{ strtoupper($country_code) }})</h3>
                             <a href="{{ route('admin.country.pages.create', $country_code) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
                                 Create New Page
                             </a>
