@@ -11,7 +11,10 @@ class AdminPageController extends Controller
 {
     public function index(string $country_code)
     {
-        $pages = Pages::latest()->get();
+        $pages = Pages::where('country_code', strtoupper($country_code))
+            ->latest()
+            ->get();
+
         return view('admin.pages.index', compact('pages', 'country_code'));
     }
 

@@ -15,7 +15,7 @@ services:
             - "DB_HOST=database"
         restart: unless-stopped
         networks:
-            - default
+            - pinklady_network  # <-- CHANGED
 
     # Nginx
     nginx:
@@ -25,8 +25,8 @@ services:
         volumes:
             - ./:/var/www/pinkladyafricaadmin
         ports:
-            - "9625:80"      # <-- UPDATED
-            - "9651:443"     # <-- UPDATED
+            - "9625:80"
+            - "9651:443"
         depends_on:
             - laravel
         healthcheck:
@@ -36,7 +36,7 @@ services:
             retries: 3
         restart: unless-stopped
         networks:
-            - default
+            - pinklady_network  # <-- CHANGED
 
     # MySQL Database
     database:
@@ -54,8 +54,9 @@ services:
             - ./docker/mysql/db_volume_mount:/var/lib/mysql
         restart: unless-stopped
         networks:
-            - default
+            - pinklady_network  # <-- CHANGED
 
+# This section tells Docker to use the pre-existing shared network
 networks:
-    default:
-        driver: bridge
+    pinklady_network:
+        external: true

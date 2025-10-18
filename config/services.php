@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'pinklady' => [
+        'api_key' => env('PINKLADY_API_KEY'),
+    ],
+
 ];
