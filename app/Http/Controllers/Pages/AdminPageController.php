@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Countries\Pages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminPageController extends Controller
 {
@@ -31,16 +32,28 @@ class AdminPageController extends Controller
         $validated = $request->validate($rules);
 
         $content = $request->input('content', []);
+        $country_code_upper = strtoupper($country_code); // Added for consistency
+        // Define base paths
+        $bannerPathBase = "uploads/{$country_code_upper}/banners";
+        $pagePathBase = "uploads/{$country_code_upper}/pages";
 
         // Process Banner Repeater Images
         if (isset($content['banners'])) {
             foreach ($content['banners'] as $index => &$bannerData) {
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
                     $file = $request->file("content.banners.{$index}.image_url");
-                    $path = $file->store('uploads/banners', 'public');
-                    $bannerData['image_url'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+
+                    // --- Use storeAs() for banners ---
+                    $originalFilename = $file->getClientOriginalName();
+                    $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
+                    $path = $file->storeAs($bannerPathBase, $safeFilename, 'public');
+                    // --- End Change ---
+
+                    $bannerData['image_url'] = ['path' => $path, 'name' => $originalFilename];
                 }
             }
+            // Address potential reference issue after loop
+            unset($bannerData);
         }
 
         // Process all single image fields
@@ -53,14 +66,20 @@ class AdminPageController extends Controller
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
-                $path = $file->store('uploads/pages', 'public');
-                $content[$field] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+
+                // --- Use storeAs() for single images ---
+                $originalFilename = $file->getClientOriginalName();
+                $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs($pagePathBase, $safeFilename, 'public');
+                // --- End Change ---
+
+                $content[$field] = ['path' => $path, 'name' => $originalFilename];
             }
         }
 
         Pages::create([
             'title' => $validated['title'],
-            'country_code' => strtoupper($country_code),
+            'country_code' => $country_code_upper,
             'template_name' => $validated['template_name'],
             'content' => $content,
         ]);
@@ -83,21 +102,37 @@ class AdminPageController extends Controller
 
         $newContent = $request->input('content', []);
         $originalContent = $page->content ?? [];
+        $country_code_upper = strtoupper($country_code); // Added for consistency
+        // Define base paths
+        $bannerPathBase = "uploads/{$country_code_upper}/banners";
+        $pagePathBase = "uploads/{$country_code_upper}/pages";
 
         // Process Banner Repeater Images
         if (isset($newContent['banners'])) {
             foreach ($newContent['banners'] as $index => &$bannerData) {
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
                     $file = $request->file("content.banners.{$index}.image_url");
-                    $path = $file->store('uploads/banners', 'public');
+
+                    // --- Use storeAs() for banners ---
+                    $originalFilename = $file->getClientOriginalName();
+                    $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
+
+                    // Delete old file if it exists
                     if (isset($originalContent['banners'][$index]['image_url']['path'])) {
                         Storage::disk('public')->delete($originalContent['banners'][$index]['image_url']['path']);
                     }
-                    $bannerData['image_url'] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+
+                    $path = $file->storeAs($bannerPathBase, $safeFilename, 'public');
+                    // --- End Change ---
+
+                    $bannerData['image_url'] = ['path' => $path, 'name' => $originalFilename];
                 } else {
+                    // Keep existing file data if no new file uploaded for this banner item
                     $bannerData['image_url'] = $originalContent['banners'][$index]['image_url'] ?? null;
                 }
             }
+            // Address potential reference issue after loop
+            unset($bannerData);
         }
 
         // Process all single image fields on update
@@ -110,21 +145,38 @@ class AdminPageController extends Controller
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
-                $path = $file->store('uploads/pages', 'public');
+
+                // --- Use storeAs() for single images ---
+                $originalFilename = $file->getClientOriginalName();
+                $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
+
+                // Delete old file if it exists
                 if (isset($originalContent[$field]['path'])) {
                     Storage::disk('public')->delete($originalContent[$field]['path']);
                 }
-                $newContent[$field] = ['path' => $path, 'name' => $file->getClientOriginalName()];
+
+                $path = $file->storeAs($pagePathBase, $safeFilename, 'public');
+                // --- End Change ---
+
+                $newContent[$field] = ['path' => $path, 'name' => $originalFilename];
             } else {
+                // Keep existing file data if no new file uploaded
                 $newContent[$field] = $originalContent[$field] ?? null;
             }
         }
 
-        // Cleanup orphaned banner images
+        // Cleanup orphaned banner images (Code remains the same, but now uses correct paths)
         $originalImagePaths = collect($originalContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $finalImagePaths = collect($newContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $imagesToDelete = $originalImagePaths->diff($finalImagePaths);
         Storage::disk('public')->delete($imagesToDelete->all());
+
+        // Cleanup orphaned single images (Added this section)
+        $originalSingleImagePaths = collect($originalContent)->only($singleImageFields)->pluck('path')->filter();
+        $finalSingleImagePaths = collect($newContent)->only($singleImageFields)->pluck('path')->filter();
+        $singleImagesToDelete = $originalSingleImagePaths->diff($finalSingleImagePaths);
+        Storage::disk('public')->delete($singleImagesToDelete->all());
+
 
         $page->update([
             'title' => $validated['title'],
