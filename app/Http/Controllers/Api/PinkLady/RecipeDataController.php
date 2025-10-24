@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\PinkLady;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\PinkLady\RecipeResource;
 use App\Http\Resources\Api\PinkLady\SingleRecipeResource; // We'll create this next
 use App\Models\Recipes\Recipe; // Assuming this is your Recipe model namespace
 use Illuminate\Http\Request;
@@ -33,8 +34,8 @@ class RecipeDataController extends Controller
      public function index(string $country_code, Request $request)
      {
          $recipes = Recipe::where('country_code', strtoupper($country_code))
-             ->where('status', 1)
-             //->latest() // Or however you want to order them
+             //->where('status', 1)
+             ->latest() // Or however you want to order them
              ->paginate($request->input('per_page', 12)); // Default 12 per page
 
          return RecipeResource::collection($recipes); // Use your existing RecipeResource for lists

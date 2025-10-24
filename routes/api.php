@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PinkLady\PageDataController;
+use App\Http\Controllers\Api\PinkLady\RecipeDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +25,14 @@ Route::middleware(['auth.apikey'])->prefix('v1/pinklady/{country_code}')->name('
      * e.g., GET /api/v1/pinklady/ng/pages
      */
     Route::get('/pages', [PageDataController::class, 'index'])->name('pages.index');
+
+
+    /**
+     * Recipe Routes (THE FIX)
+     */
+    // 2. ADD ROUTE FOR PAGINATED RECIPE INDEX
+    Route::get('/recipes', [RecipeDataController::class, 'index'])->name('recipes.index');
+
+    // 3. ADD ROUTE FOR SINGLE RECIPE
+    Route::get('/recipes/{recipe_slug}', [RecipeDataController::class, 'show'])->name('recipes.show');
 });
