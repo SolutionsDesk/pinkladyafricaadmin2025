@@ -102,6 +102,7 @@ class RecipeController extends Controller
             'content.ingredients' => 'nullable|array',
             'content.ingredients.*.ingredient' => 'required|string',
             'content.ingredients.*.type' => 'required|in:ingredient,heading',
+            'content.method' => 'nullable|string',
         ]);
 
         $newContent = $request->input('content', []);
