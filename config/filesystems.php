@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'digitalocean' => [
+            'driver' => 's3',
+            'key' => env('DO_SPACES_KEY'),
+            'secret' => env('DO_SPACES_SECRET'),
+            'region' => env('DO_SPACES_REGION'), // e.g., 'fra1', 'nyc3'
+            'bucket' => env('DO_SPACES_BUCKET'), // Your Space name
+            'endpoint' => env('DO_SPACES_ENDPOINT'), // e.g., 'https://fra1.digitaloceanspaces.com'
+            'url' => env('DO_SPACES_URL'), // Optional: Your custom domain or CDN URL
+            'use_path_style_endpoint' => env('DO_SPACES_PATH_STYLE', false), // Usually false
+            'visibility' => 'public', // Set default visibility for uploaded files
+            'throw' => false, // Set to true to throw exceptions on failure
+        ],
+
     ],
 
     /*
