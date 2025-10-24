@@ -46,26 +46,39 @@ class SiteSettingController extends Controller
 
         $newSettings = $request->input('settings', []);
         $originalSettings = $setting->settings ?? [];
+        $country_code_upper = strtoupper($country_code); // Added for consistency
+        // Define base path
+        $basePath = "uploads/{$country_code_upper}/settings";
 
         // Handle the footer logo upload
         if ($request->hasFile('settings.footer_details.footer_logo')) {
             $file = $request->file('settings.footer_details.footer_logo');
-            $path = $file->store('uploads/settings', 'public');
 
-            // Delete old logo if it exists
+            // --- CHANGE HERE: Use storeAs() ---
+            $originalFilename = $file->getClientOriginalName();
+            // Optional: Sanitize the filename
+            $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
+
+            // Delete old logo if it exists, using the 'public' disk
             if (isset($originalSettings['footer_details']['footer_logo']['path'])) {
                 Storage::disk('public')->delete($originalSettings['footer_details']['footer_logo']['path']);
             }
 
+            // Store using the original (or sanitized) filename on the 'public' disk
+            $path = $file->storeAs($basePath, $safeFilename, 'public');
+            // --- END OF CHANGE ---
+
             $newSettings['footer_details']['footer_logo'] = [
                 'path' => $path,
-                'name' => $file->getClientOriginalName(),
+                'name' => $originalFilename, // Store original name if needed
             ];
         } else {
             // Keep the existing logo if no new one is uploaded
             $newSettings['footer_details']['footer_logo'] = $originalSettings['footer_details']['footer_logo'] ?? null;
         }
 
+
+        // Update the model with the merged settings
         $setting->update(['settings' => $newSettings]);
 
         return redirect()->back()->with('success', 'Settings updated successfully!');
