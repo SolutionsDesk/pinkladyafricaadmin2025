@@ -43,13 +43,11 @@ class CompetitionController extends Controller
         if ($request->hasFile("content.bg_image")) {
             $file = $request->file("content.bg_image");
 
-            // --- CHANGE HERE: Use storeAs() ---
             $originalFilename = $file->getClientOriginalName();
-            // Optional: Sanitize the filename
             $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
-            // Store using the original (or sanitized) filename on the 'public' disk
-            $path = $file->storeAs($basePath, $safeFilename, 'public');
+            // --- MODIFIED: Use 'digitalocean' disk and set visibility ---
+            $path = Storage::disk('digitalocean')->putFileAs($basePath, $file, $safeFilename, 'public');
             // --- END OF CHANGE ---
 
             $content['bg_image'] = ['path' => $path, 'name' => $originalFilename];
@@ -93,17 +91,17 @@ class CompetitionController extends Controller
         if ($request->hasFile("content.bg_image")) {
             $file = $request->file("content.bg_image");
 
-            // --- CHANGE HERE: Use storeAs() ---
             $originalFilename = $file->getClientOriginalName();
             $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
-            // Delete old file *before* storing new one, using the 'public' disk
+            // Delete old file *before* storing new one, using the 'digitalocean' disk
             if (isset($originalContent['bg_image']['path'])) {
-                Storage::disk('public')->delete($originalContent['bg_image']['path']);
+                // --- MODIFIED: Use 'digitalocean' disk ---
+                Storage::disk('digitalocean')->delete($originalContent['bg_image']['path']);
             }
 
-            // Store using the original (or sanitized) filename on the 'public' disk
-            $path = $file->storeAs($basePath, $safeFilename, 'public');
+            // --- MODIFIED: Use 'digitalocean' disk and set visibility ---
+            $path = Storage::disk('digitalocean')->putFileAs($basePath, $file, $safeFilename, 'public');
             // --- END OF CHANGE ---
 
             $newContent['bg_image'] = ['path' => $path, 'name' => $originalFilename];
@@ -112,11 +110,7 @@ class CompetitionController extends Controller
             $newContent['bg_image'] = $originalContent['bg_image'] ?? null;
         }
 
-        // Ensure other content fields are preserved if not in request
-        // (If 'body' or 'competition_name' can be updated independently via other forms,
-        // you might need a more robust merging strategy like array_replace_recursive)
         $mergedContent = array_merge($originalContent, $newContent);
-        // Explicitly set the bg_image from newContent handling logic
         $mergedContent['bg_image'] = $newContent['bg_image'];
 
         $competition->update([
@@ -135,7 +129,8 @@ class CompetitionController extends Controller
         $this->authorize('delete', $competition);
 
         if (isset($competition->content['bg_image']['path'])) {
-            Storage::disk('public')->delete($competition->content['bg_image']['path']);
+            // --- MODIFIED: Use 'digitalocean' disk ---
+            Storage::disk('digitalocean')->delete($competition->content['bg_image']['path']);
         }
 
         $competition->delete();

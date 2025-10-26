@@ -5,9 +5,17 @@
     $action = $isEdit
         ? route('admin.country.competitions.update', ['country_code' => $country_code, 'competition' => $competition])
         : route('admin.country.competitions.store', $country_code);
+
+    // --- 1. ADD THIS LINE ---
+    $storageUrl = rtrim(Storage::disk('digitalocean')->url('/'), '/');
 @endphp
 
-<form x-data="{ bgPreview: null, bgExisting: {{ json_encode($competition->content['bg_image']['path'] ?? null) }} }" action="{{ $action }}" method="POST" enctype="multipart/form-data">
+{{-- --- 2. UPDATE THIS X-DATA --- --}}
+<form x-data="{
+    storageBaseUrl: {{ json_encode($storageUrl) }},
+    bgPreview: null,
+    bgExisting: {{ json_encode($competition->content['bg_image']['path'] ?? null) }}
+}" action="{{ $action }}" method="POST" enctype="multipart/form-data">
     @csrf
     @if($isEdit) @method('PUT') @endif
 
@@ -36,7 +44,8 @@
         <div>
             <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
             <div class="mt-2">
-                <template x-if="bgExisting && !bgPreview"><img :src="'/storage/' + bgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                {{-- --- 3. UPDATE THIS IMG SRC --- --}}
+                <template x-if="bgExisting && !bgPreview"><img :src="storageBaseUrl + '/' + bgExisting" class="h-24 w-auto rounded-md object-cover"></template>
                 <template x-if="bgPreview"><img :src="bgPreview" class="h-24 w-auto rounded-md object-cover"></template>
             </div>
             <input type="file" name="content[bg_image]" @change="bgPreview = URL.createObjectURL($event.target.files[0])" class="block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer">
@@ -51,14 +60,15 @@
 
         <div>
             <label for="body" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Body</label>
-            <textarea id="body" name="content[body]" rows="10" class="block mt-1 w-full rounded-md text-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500">{{ old('content.body', $competition->content['body'] ?? '') }}</textarea>
+            {{-- --- 4. CHANGED text-lg to txt-lg --- --}}
+            <textarea id="body" name="content[body]" rows="10" class="block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500">{{ old('content.body', $competition->content['body'] ?? '') }}</textarea>
             @error('content.body') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
         </div>
     </div>
 
     <div class="flex items-center justify-end mt-6">
         <a href="{{ route('admin.country.competitions.index', $country_code) }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900">Cancel</a>
-        <button type="submit" class="ms-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+        <button type="submit" class="ms-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-7E00">
             {{ $isEdit ? 'Update Competition' : 'Create Competition' }}
         </button>
     </div>
