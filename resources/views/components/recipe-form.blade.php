@@ -115,7 +115,7 @@
             </div>
             <div>
                 {{ html()->label('Method', 'content[method]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                {{ html()->textarea('content[method]', old('content.method', $recipe->content['method'] ?? null))->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                {{ html()->textarea('content[method]', old('content.method', $recipe->content['method'] ?? null))->rows(5)->class('block mt-1 w-full text-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                 @error('content.method') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
             </div>
         </div>

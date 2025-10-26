@@ -17,6 +17,7 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
-        "@material-tailwind/html": "^3.0.0-beta.7"
+        "@material-tailwind/html": "^3.0.0-beta.7",
+        "puppeteer": "^24.26.1"
     }
 }

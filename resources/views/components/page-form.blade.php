@@ -130,7 +130,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[info_1_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[info_1_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[info_1_content]')->rows(5)->class('block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.info_1_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -156,7 +156,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[info_2_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[info_2_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[info_2_content]')->rows(5)->class('block mt-1 w-full txt-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.info_2_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -182,7 +182,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[info_3_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[info_3_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[info_3_content]')->rows(5)->class('block mt-1 w-full txt-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.info_3_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -208,7 +208,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[grown_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[grown_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[grown_content]')->rows(5)->class('block mt-1 w-full txt-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.grown_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div class="mt-6">
@@ -278,7 +278,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[recipe_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[recipe_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[recipe_content]')->rows(5)->class('block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.recipe_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -311,7 +311,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[birth_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[birth_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[birth_content]')->rows(5)->class('block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.birth_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -338,7 +338,7 @@
                 </div>
                 <div>
                     {{ html()->label('Content', 'content[goodness_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                    {{ html()->textarea('content[goodness_content]')->rows(5)->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    {{ html()->textarea('content[goodness_content]')->rows(5)->class('block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                     @error('content.goodness_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div class="mt-6">

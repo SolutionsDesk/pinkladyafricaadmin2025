@@ -51,7 +51,7 @@
 
         <div>
             <label for="body" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Body</label>
-            <textarea id="body" name="content[body]" rows="10" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500">{{ old('content.body', $competition->content['body'] ?? '') }}</textarea>
+            <textarea id="body" name="content[body]" rows="10" class="block mt-1 w-full rounded-md text-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500">{{ old('content.body', $competition->content['body'] ?? '') }}</textarea>
             @error('content.body') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
         </div>
     </div>

@@ -14,4 +14,61 @@
             </div>
         </div>
     </div>
+    <script src="{{ asset('assets/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- Config for SMALL editors (.txt-sm) ---
+            tinymce.init({
+                selector: 'textarea.txt-sm',
+                height: 300,
+                license_key: 'gpl',
+                menubar: false,
+                base_url: '{{ asset('assets/tinymce') }}',
+
+                // --- DARK MODE SETTINGS ---
+                skin: 'oxide-dark',
+                content_css: 'dark',
+                // --- ------------------ ---
+
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'paste', 'code', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | ' +
+                    'bold italic backcolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+
+            });
+
+            // --- Config for LARGE editors (.txt-lg) ---
+            tinymce.init({
+                selector: 'textarea.txt-lg',
+                height: 500,
+                license_key: 'gpl',
+                menubar: true,
+                base_url: '{{ asset('assets/tinymce') }}',
+
+                // --- DARK MODE SETTINGS ---
+                skin: 'oxide-dark',
+                content_css: 'dark',
+                // --- ------------------ ---
+
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'paste', 'code', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | ' +
+                    'bold italic backcolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | '+
+                    'removeformat | help',
+
+            });
+
+        });
+    </script>
 </x-app-layout>
