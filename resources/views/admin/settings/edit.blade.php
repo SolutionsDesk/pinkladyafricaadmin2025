@@ -5,9 +5,19 @@
         </h2>
     </x-slot>
 
+    {{-- 1. ADD THIS PHP BLOCK --}}
+    @php
+        $storageUrl = rtrim(Storage::disk('digitalocean')->url('/'), '/');
+    @endphp
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"
-             x-data="{ footerLogoPreview: null, footerLogoExisting: {{ json_encode($setting->settings['footer_details']['footer_logo']['path'] ?? null) }} }">
+             {{-- 2. UPDATE THIS x-data ATTRIBUTE --}}
+             x-data="{
+                storageBaseUrl: {{ json_encode($storageUrl) }},
+                footerLogoPreview: null,
+                footerLogoExisting: {{ json_encode($setting->settings['footer_details']['footer_logo']['path'] ?? null) }}
+             }">
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <form action="{{ route('admin.country.settings.update', $country_code) }}" method="POST" enctype="multipart/form-data">
@@ -63,7 +73,8 @@
                             <div>
                                 <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Footer Logo</label>
                                 <div class="mt-2">
-                                    <template x-if="footerLogoExisting && !footerLogoPreview"><img :src="'/storage/' + footerLogoExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                                    {{-- 3. UPDATE THIS IMG SRC --}}
+                                    <template x-if="footerLogoExisting && !footerLogoPreview"><img :src="storageBaseUrl + '/' + footerLogoExisting" class="h-24 w-auto rounded-md object-cover"></template>
                                     <template x-if="footerLogoPreview"><img :src="footerLogoPreview" class="h-24 w-auto rounded-md object-cover"></template>
                                 </div>
                                 <input type="file" name="settings[footer_details][footer_logo]" @change="footerLogoPreview = URL.createObjectURL($event.target.files[0])" class="block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Settings\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str; // <-- Make sure Str is imported
 
 class SiteSettingController extends Controller
 {
@@ -54,18 +55,18 @@ class SiteSettingController extends Controller
         if ($request->hasFile('settings.footer_details.footer_logo')) {
             $file = $request->file('settings.footer_details.footer_logo');
 
-            // --- CHANGE HERE: Use storeAs() ---
             $originalFilename = $file->getClientOriginalName();
             // Optional: Sanitize the filename
             $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
-            // Delete old logo if it exists, using the 'public' disk
+            // Delete old logo if it exists, using the 'digitalocean' disk
             if (isset($originalSettings['footer_details']['footer_logo']['path'])) {
-                Storage::disk('public')->delete($originalSettings['footer_details']['footer_logo']['path']);
+                // --- MODIFIED: Use 'digitalocean' disk ---
+                Storage::disk('digitalocean')->delete($originalSettings['footer_details']['footer_logo']['path']);
             }
 
-            // Store using the original (or sanitized) filename on the 'public' disk
-            $path = $file->storeAs($basePath, $safeFilename, 'public');
+            // --- MODIFIED: Use 'digitalocean' disk and set visibility ---
+            $path = Storage::disk('digitalocean')->putFileAs($basePath, $file, $safeFilename, 'public');
             // --- END OF CHANGE ---
 
             $newSettings['footer_details']['footer_logo'] = [
@@ -83,4 +84,6 @@ class SiteSettingController extends Controller
 
         return redirect()->back()->with('success', 'Settings updated successfully!');
     }
+
+
 }
