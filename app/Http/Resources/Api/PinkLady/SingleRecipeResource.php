@@ -19,17 +19,6 @@ class SingleRecipeResource extends JsonResource
         // Access the content JSON data, default to empty array if null
         $content = $this->content ?? [];
 
-        // Helper function to get full URL for stored files
-        $getFileUrl = function ($fileData) {
-            // Check if fileData is an array and has a 'path' key
-            if (is_array($fileData) && isset($fileData['path'])) {
-                // Ensure the path exists before generating URL
-                return Storage::disk('public')->exists($fileData['path'])
-                    ? Storage::disk('public')->url($fileData['path'])
-                    : null;
-            }
-            return null;
-        };
 
         // Build the data array
         $data = [
@@ -41,14 +30,14 @@ class SingleRecipeResource extends JsonResource
             'created_at' => $this->created_at?->toIso8601String(), // Format date
 
             // --- Extract fields from the 'content' JSON column ---
-            'image_url' => $getFileUrl($content['banner_image'] ?? null),
+            'image_url' => $content['banner_image'] ?? null,
             'cooking_time' => $content['cooking_time'] ?? null,
             'serves' => $content['serves'] ?? null,
             'author' => $content['chef_name'] ?? 'Pink Lady®', // Use chef_name, default if empty
-            'chef_logo_url' => $getFileUrl($content['chef_logo'] ?? null), // Added chef logo URL
+            'chef_logo_url' => $content['chef_logo'] ?? null, // Added chef logo URL
             'chef_website' => $content['chef_website'] ?? null,
-            'pdf_url' => $getFileUrl($content['recipe_pdf'] ?? null),
-            'video_url' => $getFileUrl($content['recipe_video'] ?? null),
+            'pdf_url' => $content['recipe_pdf'] ?? null,
+            'video_url' => $content['recipe_video'] ?? null,
             'video_name' => $content['video_name'] ?? null, // Added video name
 
             // Ingredients are already an array within content

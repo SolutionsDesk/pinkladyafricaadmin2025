@@ -24,6 +24,7 @@ class RecipeController extends Controller
 
     public function store(Request $request, string $country_code)
     {
+        //dd($request->all());
         $this->authorize('createForCountry', [Recipe::class, $country_code]);
 
         $validated = $request->validate([
