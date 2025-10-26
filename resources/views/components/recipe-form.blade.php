@@ -5,9 +5,14 @@
     $action = $isEdit
         ? route('admin.country.recipes.update', ['country_code' => $country_code, 'recipe' => $recipe])
         : route('admin.country.recipes.store', $country_code);
+
+    // --- 1. ADDED THIS LINE ---
+    $storageUrl = rtrim(Storage::disk('digitalocean')->url('/'), '/');
 @endphp
 
 <form x-data="recipeForm({
+    // --- 2. ADDED THIS LINE ---
+    storageBaseUrl: {{ json_encode($storageUrl) }},
     ingredients: {{ json_encode(old('content.ingredients', $recipe->content['ingredients'] ?? [])) }},
     bannerPreview: null,
     bannerExisting: {{ json_encode($recipe->content['banner_image']['path'] ?? null) }},
@@ -31,7 +36,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Banner Image</label>
                     <div class="mt-2">
-                        <template x-if="bannerExisting && !bannerPreview"><img :src="'/storage/' + bannerExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        {{-- --- 3. MODIFIED THIS LINE --- --}}
+                        <template x-if="bannerExisting && !bannerPreview"><img :src="storageBaseUrl + '/' + bannerExisting" class="h-24 w-auto rounded-md object-cover"></template>
                         <template x-if="bannerPreview"><img :src="bannerPreview" class="h-24 w-auto rounded-md object-cover"></template>
                     </div>
                     <input type="file" name="content[banner_image]" @change="setBannerPreview($event)" class="block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer">
@@ -58,7 +64,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Chef Logo</label>
                     <div class="mt-2">
-                        <template x-if="chefLogoExisting && !chefLogoPreview"><img :src="'/storage/' + chefLogoExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        {{-- --- 3. MODIFIED THIS LINE --- --}}
+                        <template x-if="chefLogoExisting && !chefLogoPreview"><img :src="storageBaseUrl + '/' + chefLogoExisting" class="h-24 w-auto rounded-md object-cover"></template>
                         <template x-if="chefLogoPreview"><img :src="chefLogoPreview" class="h-24 w-auto rounded-md object-cover"></template>
                     </div>
                     <input type="file" name="content[chef_logo]" @change="setChefLogoPreview($event)" class="block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer">
@@ -115,7 +122,7 @@
             </div>
             <div>
                 {{ html()->label('Method', 'content[method]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
-                {{ html()->textarea('content[method]', old('content.method', $recipe->content['method'] ?? null))->rows(5)->class('block mt-1 w-full text-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                {{ html()->textarea('content[method]', old('content.method', $recipe->content['method'] ?? null))->rows(5)->class('block mt-1 w-full txt-lg rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
                 @error('content.method') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
             </div>
         </div>
@@ -142,6 +149,8 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('recipeForm', (initialData) => ({
+            // --- 2. ADDED THIS LINE ---
+            storageBaseUrl: initialData.storageBaseUrl,
             ingredients: initialData.ingredients.map(item => ({...item})),
             bannerPreview: initialData.bannerPreview,
             bannerExisting: initialData.bannerExisting,
@@ -155,7 +164,7 @@
                 if(file) { this.bannerPreview = URL.createObjectURL(file); }
             },
             setChefLogoPreview(event) {
-                const file = event.target.files[0];
+                const file = event.targesetChefLogoPreviewt.files[0];
                 if(file) { this.chefLogoPreview = URL.createObjectURL(file); }
             },
         }));

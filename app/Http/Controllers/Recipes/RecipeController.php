@@ -46,7 +46,6 @@ class RecipeController extends Controller
 
         // Process all file uploads
         $country_code_upper = strtoupper($country_code);
-        // Define base path within the public disk's storage/app/public directory
         $basePath = "uploads/{$country_code_upper}/recipes";
 
         // Process all file uploads
@@ -54,17 +53,14 @@ class RecipeController extends Controller
         foreach ($fileFields as $field) {
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
-
-                // --- CHANGE HERE: Use storeAs() with original filename ---
                 $originalFilename = $file->getClientOriginalName();
-                // Optional: Sanitize the filename
                 $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
-                // Store using the original (or sanitized) filename on the 'public' disk
-                $path = $file->storeAs($basePath, $safeFilename, 'public');
+                // --- MODIFIED: Use 'digitalocean' disk and set visibility ---
+                $path = Storage::disk('digitalocean')->putFileAs($basePath, $file, $safeFilename, 'public');
                 // --- END OF CHANGE ---
 
-                // Store the path returned by storeAs (relative to storage/app/public)
+                // Store the path returned
                 $content[$field] = ['path' => $path, 'name' => $originalFilename];
             }
         }
@@ -116,17 +112,17 @@ class RecipeController extends Controller
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
 
-                // --- CHANGE HERE: Use storeAs() ---
                 $originalFilename = $file->getClientOriginalName();
                 $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
-                // Delete old file *before* storing new one, using the 'public' disk
+                // Delete old file *before* storing new one
                 if (isset($originalContent[$field]['path'])) {
-                    Storage::disk('public')->delete($originalContent[$field]['path']);
+                    // --- MODIFIED: Use 'digitalocean' disk ---
+                    Storage::disk('digitalocean')->delete($originalContent[$field]['path']);
                 }
 
-                // Store using the original (or sanitized) filename on the 'public' disk
-                $path = $file->storeAs($basePath, $safeFilename, 'public');
+                // --- MODIFIED: Use 'digitalocean' disk and set visibility ---
+                $path = Storage::disk('digitalocean')->putFileAs($basePath, $file, $safeFilename, 'public');
                 // --- END OF CHANGE ---
 
                 $newContent[$field] = ['path' => $path, 'name' => $originalFilename];
@@ -139,6 +135,11 @@ class RecipeController extends Controller
         // Ensure ingredients are preserved if not updated
         if (!isset($newContent['ingredients']) && isset($originalContent['ingredients'])) {
             $newContent['ingredients'] = $originalContent['ingredients'];
+        }
+
+        // Ensure method is preserved if not updated
+        if (!isset($newContent['method']) && isset($originalContent['method'])) {
+            $newContent['method'] = $originalContent['method'];
         }
 
         $recipe->update([
@@ -161,7 +162,9 @@ class RecipeController extends Controller
             $recipe->content['recipe_pdf']['path'] ?? null,
             $recipe->content['recipe_video']['path'] ?? null,
         ];
-        Storage::disk('public')->delete(array_filter($filePaths));
+
+        // --- MODIFIED: Use 'digitalocean' disk ---
+        Storage::disk('digitalocean')->delete(array_filter($filePaths));
 
         $recipe->delete();
 

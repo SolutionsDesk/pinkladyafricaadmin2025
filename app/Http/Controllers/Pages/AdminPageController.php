@@ -43,10 +43,11 @@ class AdminPageController extends Controller
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
                     $file = $request->file("content.banners.{$index}.image_url");
 
-                    // --- Use storeAs() for banners ---
                     $originalFilename = $file->getClientOriginalName();
                     $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs($bannerPathBase, $safeFilename, 'public');
+
+                    // --- MODIFIED: Use 'spaces' disk and set visibility ---
+                    $path = Storage::disk('digitalocean')->putFileAs($bannerPathBase, $file, $safeFilename, 'public');
                     // --- End Change ---
 
                     $bannerData['image_url'] = ['path' => $path, 'name' => $originalFilename];
@@ -67,10 +68,11 @@ class AdminPageController extends Controller
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
 
-                // --- Use storeAs() for single images ---
                 $originalFilename = $file->getClientOriginalName();
                 $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs($pagePathBase, $safeFilename, 'public');
+
+                // --- MODIFIED: Use 'spaces' disk and set visibility ---
+                $path = Storage::disk('digitalocean')->putFileAs($pagePathBase, $file, $safeFilename, 'public');
                 // --- End Change ---
 
                 $content[$field] = ['path' => $path, 'name' => $originalFilename];
@@ -113,16 +115,17 @@ class AdminPageController extends Controller
                 if ($request->hasFile("content.banners.{$index}.image_url")) {
                     $file = $request->file("content.banners.{$index}.image_url");
 
-                    // --- Use storeAs() for banners ---
                     $originalFilename = $file->getClientOriginalName();
                     $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
                     // Delete old file if it exists
                     if (isset($originalContent['banners'][$index]['image_url']['path'])) {
-                        Storage::disk('public')->delete($originalContent['banners'][$index]['image_url']['path']);
+                        // --- MODIFIED: Use 'spaces' disk ---
+                        Storage::disk('digitalocean')->delete($originalContent['banners'][$index]['image_url']['path']);
                     }
 
-                    $path = $file->storeAs($bannerPathBase, $safeFilename, 'public');
+                    // --- MODIFIED: Use 'spaces' disk and set visibility ---
+                    $path = Storage::disk('digitalocean')->putFileAs($bannerPathBase, $file, $safeFilename, 'public');
                     // --- End Change ---
 
                     $bannerData['image_url'] = ['path' => $path, 'name' => $originalFilename];
@@ -146,16 +149,17 @@ class AdminPageController extends Controller
             if ($request->hasFile("content.{$field}")) {
                 $file = $request->file("content.{$field}");
 
-                // --- Use storeAs() for single images ---
                 $originalFilename = $file->getClientOriginalName();
                 $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
 
                 // Delete old file if it exists
                 if (isset($originalContent[$field]['path'])) {
-                    Storage::disk('public')->delete($originalContent[$field]['path']);
+                    // --- MODIFIED: Use 'spaces' disk ---
+                    Storage::disk('digitalocean')->delete($originalContent[$field]['path']);
                 }
 
-                $path = $file->storeAs($pagePathBase, $safeFilename, 'public');
+                // --- MODIFIED: Use 'spaces' disk and set visibility ---
+                $path = Storage::disk('digitalocean')->putFileAs($pagePathBase, $file, $safeFilename, 'public');
                 // --- End Change ---
 
                 $newContent[$field] = ['path' => $path, 'name' => $originalFilename];
@@ -165,17 +169,19 @@ class AdminPageController extends Controller
             }
         }
 
-        // Cleanup orphaned banner images (Code remains the same, but now uses correct paths)
+        // Cleanup orphaned banner images
         $originalImagePaths = collect($originalContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $finalImagePaths = collect($newContent['banners'] ?? [])->pluck('image_url.path')->filter();
         $imagesToDelete = $originalImagePaths->diff($finalImagePaths);
-        Storage::disk('public')->delete($imagesToDelete->all());
+        // --- MODIFIED: Use 'spaces' disk ---
+        Storage::disk('digitalocean')->delete($imagesToDelete->all());
 
-        // Cleanup orphaned single images (Added this section)
+        // Cleanup orphaned single images
         $originalSingleImagePaths = collect($originalContent)->only($singleImageFields)->pluck('path')->filter();
         $finalSingleImagePaths = collect($newContent)->only($singleImageFields)->pluck('path')->filter();
         $singleImagesToDelete = $originalSingleImagePaths->diff($finalSingleImagePaths);
-        Storage::disk('public')->delete($singleImagesToDelete->all());
+        // --- MODIFIED: Use 'spaces' disk ---
+        Storage::disk('digitalocean')->delete($singleImagesToDelete->all());
 
 
         $page->update([

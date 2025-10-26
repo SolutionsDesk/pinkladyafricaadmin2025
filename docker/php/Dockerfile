@@ -1,5 +1,5 @@
 FROM php:8.2-fpm
-
+COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 # Update the PHP-FPM port
 RUN sed -i 's/9000/9325/' /usr/local/etc/php-fpm.d/zz-docker.conf
 

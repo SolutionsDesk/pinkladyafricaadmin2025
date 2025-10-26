@@ -11,9 +11,16 @@
         'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
         'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
     ])->sortBy(fn($value, $key) => $value)->toArray();
+
+    // --- ADDED THIS LINE ---
+    // Get the base URL from your 'digitalocean' disk config
+    $storageUrl = rtrim(Storage::disk('digitalocean')->url('/'), '/');
 @endphp
 
 {{ html()->model($page)->form('POST', $action)->attributes(['x-data' => "pageForm({
+    // --- ADDED THIS LINE ---
+    storageBaseUrl: " . json_encode($storageUrl) . ",
+
     banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
     goodnessList: " . json_encode(old('content.goodness_list', $page->content['goodness_list'] ?? [])) . ",
     selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
@@ -68,7 +75,8 @@
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
                                 <template x-if="banner.image_url && !banner.new_image_preview">
                                     <div class="mt-2">
-                                        <img :src="'/storage/' + (banner.image_url.path || banner.image_url)"
+                                        {{-- --- MODIFIED THIS LINE --- --}}
+                                        <img :src="storageBaseUrl + '/' + (banner.image_url.path || banner.image_url)"
                                              class="h-24 w-auto rounded-md object-cover">
                                     </div>
                                 </template>
@@ -114,7 +122,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="info1BgExisting && !info1BgPreview"><img :src="'/storage/' + info1BgExisting"
+                        {{-- --- MODIFIED THIS LINE --- --}}
+                        <template x-if="info1BgExisting && !info1BgPreview"><img :src="storageBaseUrl + '/' + info1BgExisting"
                                                                                  class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="info1BgPreview"><img :src="info1BgPreview"
@@ -140,7 +149,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="info2BgExisting && !info2BgPreview"><img :src="'/storage/' + info2BgExisting"
+                        {{-- --- MODIFIED THIS LINE --- --}}
+                        <template x-if="info2BgExisting && !info2BgPreview"><img :src="storageBaseUrl + '/' + info2BgExisting"
                                                                                  class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="info2BgPreview"><img :src="info2BgPreview"
@@ -166,7 +176,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="info3BgExisting && !info3BgPreview"><img :src="'/storage/' + info3BgExisting"
+                        {{-- --- MODIFIED THIS LINE --- --}}
+                        <template x-if="info3BgExisting && !info3BgPreview"><img :src="storageBaseUrl + '/' + info3BgExisting"
                                                                                  class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="info3BgPreview"><img :src="info3BgPreview"
@@ -192,8 +203,9 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
+                        {{-- --- MODIFIED THIS LINE --- --}}
                         <template x-if="grownImageExisting && !grownImagePreview"><img
-                                :src="'/storage/' + grownImageExisting" class="h-24 w-auto rounded-md object-cover">
+                                :src="storageBaseUrl + '/' + grownImageExisting" class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="grownImagePreview"><img :src="grownImagePreview"
                                                                 class="h-24 w-auto rounded-md object-cover"></template>
@@ -217,8 +229,9 @@
                         <div>
                             <label class="block text-xs text-gray-600 dark:text-gray-400">Packed with goodness</label>
                             <div class="mt-1">
+                                {{-- --- MODIFIED THIS LINE --- --}}
                                 <template x-if="image1Existing && !image1Preview"><img
-                                        :src="'/storage/' + image1Existing" class="h-24 w-24 rounded-md object-cover">
+                                        :src="storageBaseUrl + '/' + image1Existing" class="h-24 w-24 rounded-md object-cover">
                                 </template>
                                 <template x-if="image1Preview"><img :src="image1Preview"
                                                                     class="h-24 w-24 rounded-md object-cover">
@@ -230,8 +243,9 @@
                         <div>
                             <label class="block text-xs text-gray-600 dark:text-gray-400">Healthy living</label>
                             <div class="mt-1">
+                                {{-- --- MODIFIED THIS LINE --- --}}
                                 <template x-if="image2Existing && !image2Preview"><img
-                                        :src="'/storage/' + image2Existing" class="h-24 w-24 rounded-md object-cover">
+                                        :src="storageBaseUrl + '/' + image2Existing" class="h-24 w-24 rounded-md object-cover">
                                 </template>
                                 <template x-if="image2Preview"><img :src="image2Preview"
                                                                     class="h-24 w-24 rounded-md object-cover">
@@ -243,8 +257,9 @@
                         <div>
                             <label class="block text-xs text-gray-600 dark:text-gray-400">Competitions</label>
                             <div class="mt-1">
+                                {{-- --- MODIFIED THIS LINE --- --}}
                                 <template x-if="image3Existing && !image3Preview"><img
-                                        :src="'/storage/' + image3Existing" class="h-24 w-24 rounded-md object-cover">
+                                        :src="storageBaseUrl + '/' + image3Existing" class="h-24 w-24 rounded-md object-cover">
                                 </template>
                                 <template x-if="image3Preview"><img :src="image3Preview"
                                                                     class="h-24 w-24 rounded-md object-cover">
@@ -262,7 +277,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="recipeBgExisting && !recipeBgPreview"><img :src="'/storage/' + recipeBgExisting"
+                        {{-- --- MODIFIED THIS LINE --- --}}
+                        <template x-if="recipeBgExisting && !recipeBgPreview"><img :src="storageBaseUrl + '/' + recipeBgExisting"
                                                                                    class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="recipeBgPreview"><img :src="recipeBgPreview"
@@ -295,7 +311,8 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
-                        <template x-if="birthBgExisting && !birthBgPreview"><img :src="'/storage/' + birthBgExisting"
+                        {{-- --- MODIFIED THIS LINE --- --}}
+                        <template x-if="birthBgExisting && !birthBgPreview"><img :src="storageBaseUrl + '/' + birthBgExisting"
                                                                                  class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="birthBgPreview"><img :src="birthBgPreview"
@@ -321,8 +338,9 @@
                 <div>
                     <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
                     <div class="mt-2">
+                        {{-- --- MODIFIED THIS LINE --- --}}
                         <template x-if="goodnessBgExisting && !goodnessBgPreview"><img
-                                :src="'/storage/' + goodnessBgExisting" class="h-24 w-auto rounded-md object-cover">
+                                :src="storageBaseUrl + '/' + goodnessBgExisting" class="h-24 w-auto rounded-md object-cover">
                         </template>
                         <template x-if="goodnessBgPreview"><img :src="goodnessBgPreview"
                                                                 class="h-24 w-auto rounded-md object-cover"></template>
@@ -396,6 +414,9 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('pageForm', (initialData) => ({
+            // --- ADDED THIS LINE ---
+            storageBaseUrl: initialData.storageBaseUrl,
+
             banners: initialData.banners.map(banner => ({...banner, new_image_preview: null})),
             goodnessList: initialData.goodnessList.map(item => ({...item})), // New repeater data
             selectedTemplate: initialData.selectedTemplate,

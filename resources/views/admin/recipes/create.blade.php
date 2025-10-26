@@ -4,6 +4,33 @@
             Create New Recipe ({{ strtoupper($country_code) }})
         </h2>
     </x-slot>
+
+    {{-- --- ADD THIS ERROR NOTIFICATION BLOCK --- --}}
+    @if ($errors->any())
+        <div x-data="{ show: true }"
+             x-show="show"
+             x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+             x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed top-24 right-6 w-full max-w-md bg-red-600 text-white rounded-lg shadow-lg p-4 z-50">
+
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-bold text-lg">Whoops! Something went wrong.</h4>
+                <button @click="show = false" class="text-xl font-bold leading-none">&times;</button>
+            </div>
+
+            <ul class="mt-2 list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    {{-- --- END OF NOTIFICATION BLOCK --- --}}
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -71,4 +98,8 @@
 
         });
     </script>
+
+    @php
+    echo phpinfo();
+    @endphp
 </x-app-layout>
