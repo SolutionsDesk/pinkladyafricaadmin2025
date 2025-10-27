@@ -9,7 +9,7 @@
     $templates = collect([
         'default' => 'Default Template', 'home' => 'Homepage', 'contact' => 'Contact',
         'retailers' => 'Retailers', 'suppliers' => 'Suppliers', 'find' => 'Find Pink Lady Apples',
-        'healthy' => 'Healthy Living', 'recipes' => 'Recipes', 'story' => 'Our Story'
+        'healthy' => 'Healthy Living', 'recipes' => 'Recipes','recipes-started' => 'Recipes - Starters','recipes-mains' => 'Recipes - Mains','recipes-sweet' => 'Recipes - Sweet','recipes-snacks' => 'Recipes - Snacks','recipes-video' => 'Recipes - Video', 'story' => 'Our Story'
     ])->sortBy(fn($value, $key) => $value)->toArray();
 
     // --- ADDED THIS LINE ---
