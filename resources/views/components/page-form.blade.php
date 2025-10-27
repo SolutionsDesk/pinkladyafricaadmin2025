@@ -23,6 +23,7 @@
 
     banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
     goodnessList: " . json_encode(old('content.goodness_list', $page->content['goodness_list'] ?? [])) . ",
+    healthyList: " . json_encode(old('content.healthy_list', $page->content['healthy_list'] ?? [])) . ", // <-- NEW List
     selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
     info1BgPreview: null,
     info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . ",
@@ -43,7 +44,9 @@
     birthBgPreview: null,
     birthBgExisting: " . json_encode($page->content['birth_bg_image']['path'] ?? null) . ",
     goodnessBgPreview: null,
-    goodnessBgExisting: " . json_encode($page->content['goodness_bg_image']['path'] ?? null) . "
+    goodnessBgExisting: " . json_encode($page->content['goodness_bg_image']['path'] ?? null) . ",
+    healthyBgPreview: null, // <-- NEW Preview
+    healthyBgExisting: " . json_encode($page->content['healthy_bg_image']['path'] ?? null) . " // <-- NEW Existing
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit)
@@ -382,6 +385,47 @@
 
         </div>
         {{-- End of Our Story Template section --}}
+
+        <div x-show="selectedTemplate === 'healthy'" x-transition class="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Apple Facts Section</h3> {{-- Renamed Heading --}}
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        {{-- Renamed Alpine Vars --}}
+                        <template x-if="healthyBgExisting && !healthyBgPreview"><img :src="storageBaseUrl + '/' + healthyBgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="healthyBgPreview"><img :src="healthyBgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{-- Renamed Input Name, Alpine Function, Error Key --}}
+                    {{ html()->file('content[healthy_bg_image]')->attributes(['@change' => 'setHealthyBgPreview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.healthy_bg_image') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{-- Renamed Input Name, Error Key --}}
+                    {{ html()->label('Title', 'content[healthy_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[healthy_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.healthy_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Apple Facts</h4> {{-- Renamed Heading --}}
+                    <div class="space-y-2">
+                        {{-- Renamed Alpine List Var --}}
+                        <template x-for="(item, index) in healthyList" :key="index">
+                            <div class="flex items-center space-x-2">
+                                {{-- Renamed Input Name --}}
+                                <input type="text" :name="'content[healthy_list][' + index + '][text]'" x-model="item.text" class="block w-full text-sm rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                                {{-- Renamed Alpine List Var --}}
+                                <button @click.prevent="healthyList.splice(index, 1)" type="button" class="text-red-500 hover:text-red-700">Remove</button>
+                            </div>
+                        </template>
+                    </div>
+                    {{-- Renamed Alpine Function --}}
+                    <button @click.prevent="addHealthyItem()" type="button" class="mt-2 text-sm inline-flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">Add List Item</button>
+                </div>
+            </div>
+        </div>
+        {{-- End of Healthy Living Template section --}}
     </div>
 
 
@@ -419,6 +463,7 @@
 
             banners: initialData.banners.map(banner => ({...banner, new_image_preview: null})),
             goodnessList: initialData.goodnessList.map(item => ({...item})), // New repeater data
+            healthyList: initialData.healthyList.map(item => ({...item})), // New repeater data
             selectedTemplate: initialData.selectedTemplate,
             info1BgPreview: initialData.info1BgPreview,
             info1BgExisting: initialData.info1BgExisting,
@@ -440,6 +485,8 @@
             birthBgExisting: initialData.birthBgExisting,
             goodnessBgPreview: initialData.goodnessBgPreview,
             goodnessBgExisting: initialData.goodnessBgExisting,
+            healthyBgPreview: initialData.healthyBgPreview, // <-- NEW Preview Init
+            healthyBgExisting: initialData.healthyBgExisting, // <-- NEW Existing Init
 
             addBanner() {
                 this.banners.push({image_url: '', title: '', description: '', new_image_preview: null});
@@ -512,6 +559,12 @@
                 if (file) {
                     this.goodnessBgPreview = URL.createObjectURL(file);
                 }
+            },
+
+            addHealthyItem() { this.healthyList.push({text: ''}); }, // <-- NEW Add Item
+            setHealthyBgPreview(event) { // <-- NEW Set Preview
+                const file = event.target.files[0];
+                if (file) { this.healthyBgPreview = URL.createObjectURL(file); }
             },
         }));
     });
