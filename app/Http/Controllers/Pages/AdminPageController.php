@@ -62,7 +62,9 @@ class AdminPageController extends Controller
             'info_1_bg', 'info_2_bg', 'info_3_bg',
             'grown_image', 'image_1', 'image_2', 'image_3',
             'recipe_bg_image',
-            'birth_bg_image', 'goodness_bg_image'
+            'birth_bg_image', 'goodness_bg_image',
+            'healthy_bg_image',
+            'healthy_tips_hl_bg_image'
         ];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
@@ -143,7 +145,11 @@ class AdminPageController extends Controller
             'info_1_bg', 'info_2_bg', 'info_3_bg',
             'grown_image', 'image_1', 'image_2', 'image_3',
             'recipe_bg_image',
-            'birth_bg_image', 'goodness_bg_image'
+            'birth_bg_image', 'goodness_bg_image',
+            // --- ADD THESE LINES ---
+            'healthy_bg_image',
+            'healthy_tips_hl_bg_image',
+            // --- END ADDED LINES ---
         ];
         foreach ($singleImageFields as $field) {
             if ($request->hasFile("content.{$field}")) {
@@ -255,6 +261,33 @@ class AdminPageController extends Controller
                 'content.goodness_list.*.text' => 'required_with:content.goodness_list|string',
             ];
         }
+
+        // --- ADD THIS BLOCK ---
+        elseif ($templateName === 'healthy') {
+            $imageRule = $isUpdate ? 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' : 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048';
+            $templateRules = [
+                'content.healthy_bg_image' => $imageRule, // Assuming nullable
+                'content.healthy_title' => 'nullable|string',
+                'content.healthy_list' => 'nullable|array',
+                'content.healthy_list.*.text' => 'required_with:content.healthy_list|string',
+
+                'content.healthy_tips_hl_bg_image' => $imageRule, // Assuming nullable
+                'content.healthy_tips_hl_title' => 'nullable|string',
+                'content.healthy_tips_hl_content' => 'nullable|string', // Rule for the new content field
+            ];
+        }
+
+        // --- ADD VALIDATION FOR SUPPLIERS/RETAILERS ---
+        elseif (in_array($templateName, ['suppliers', 'retailers'])) {
+            $templateRules = [
+                'content.contacts_list' => 'nullable|array', // The list itself is optional
+                // Rules for items *if* the list exists and has items
+                'content.contacts_list.*.company_name' => 'required_with:content.contacts_list|string|max:255',
+                'content.contacts_list.*.contact_person' => 'nullable|string|max:255',
+                'content.contacts_list.*.contact_email' => 'nullable|email|max:255',
+            ];
+        }
+        // --- END ADDED VALIDATION ---
 
         return array_merge($baseRules, $templateRules);
     }

@@ -24,6 +24,7 @@
     banners: " . json_encode(old('content.banners', $page->content['banners'] ?? [])) . ",
     goodnessList: " . json_encode(old('content.goodness_list', $page->content['goodness_list'] ?? [])) . ",
     healthyList: " . json_encode(old('content.healthy_list', $page->content['healthy_list'] ?? [])) . ", // <-- NEW List
+    contactsList: " . json_encode(old('content.contacts_list', $page->content['contacts_list'] ?? [])) . ",
     selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "',
     info1BgPreview: null,
     info1BgExisting: " . json_encode($page->content['info_1_bg']['path'] ?? null) . ",
@@ -46,7 +47,13 @@
     goodnessBgPreview: null,
     goodnessBgExisting: " . json_encode($page->content['goodness_bg_image']['path'] ?? null) . ",
     healthyBgPreview: null, // <-- NEW Preview
-    healthyBgExisting: " . json_encode($page->content['healthy_bg_image']['path'] ?? null) . " // <-- NEW Existing
+    healthyBgExisting: " . json_encode($page->content['healthy_bg_image']['path'] ?? null) . ", // <-- NEW Existing
+    // --- ADDED THESE LINES for healthy_tips_hl_ section ---
+    healthyTipsHlBgPreview: null,
+    healthyTipsHlBgExisting: " . json_encode($page->content['healthy_tips_hl_bg_image']['path'] ?? null) . ",
+    // --- END ADDED LINES ---
+    selectedTemplate: '" . old('template_name', $page->template_name ?? 'default') . "'
+    // ... (rest of the image preview/existing variables) ...
 })", 'enctype' => 'multipart/form-data'])->open() }}
 
 @if($isEdit)
@@ -424,8 +431,86 @@
                     <button @click.prevent="addHealthyItem()" type="button" class="mt-2 text-sm inline-flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">Add List Item</button>
                 </div>
             </div>
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Healthy Tips (tips fetch via healthy living section)</h3> {{-- Renamed Heading --}}
+                <div>
+                    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">Background Image</label>
+                    <div class="mt-2">
+                        {{-- Renamed Alpine Vars --}}
+                        <template x-if="healthyTipsHlBgExisting && !healthyTipsHlBgPreview"><img :src="storageBaseUrl + '/' + healthyTipsHlBgExisting" class="h-24 w-auto rounded-md object-cover"></template>
+                        <template x-if="healthyTipsHlBgPreview"><img :src="healthyTipsHlBgPreview" class="h-24 w-auto rounded-md object-cover"></template>
+                    </div>
+                    {{-- Renamed Input Name, Alpine Function, Error Key --}}
+                    {{ html()->file('content[healthy_tips_hl_bg_image]')->attributes(['@change' => 'setHealthyTipsHlBgPreview($event)'])->class('block mt-2 text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-300 dark:hover:file:bg-gray-600 cursor-pointer') }}
+                    @error('content.healthy_tips_hl_bg_image') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{-- Renamed Input Name, Error Key --}}
+                    {{ html()->label('Title', 'content[healthy_tips_hl_title]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->text('content[healthy_tips_hl_title]')->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.healthy_tips_hl_title') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    {{-- Renamed Input Name, Error Key --}}
+                    {{ html()->label('Content', 'content[healthy_tips_hl_content]')->class('block font-medium text-sm text-gray-700 dark:text-gray-300') }}
+                    {{ html()->textarea('content[healthy_tips_hl_content]')->rows(5)->class('block mt-1 w-full rounded-md txt-lg shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+                    @error('content.healthy_tips_hl_content') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+
+            </div>
+
         </div>
         {{-- End of Healthy Living Template section --}}
+
+        {{-- Suppliers/Retailers Contact List Section --}}
+        <div x-show="selectedTemplate === 'suppliers' || selectedTemplate === 'retailers'" x-transition
+             class="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Contact List</h3>
+            <div class="space-y-4">
+                <template x-for="(contact, index) in contactsList" :key="index">
+                    <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-semibold" x-text="'Contact ' + (index + 1)"></h4>
+                            <button @click.prevent="contactsList.splice(index, 1)" type="button"
+                                    class="text-red-500 hover:text-red-700 text-sm">Remove
+                            </button>
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <label :for="'contact_company_' + index"
+                                       class="text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
+                                <input type="text" :name="'content[contacts_list][' + index + '][company_name]'"
+                                       x-model="contact.company_name"
+                                       class="block mt-1 w-full text-sm rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                                @error('content.contacts_list.*.company_name') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label :for="'contact_person_' + index"
+                                       class="text-sm font-medium text-gray-700 dark:text-gray-300">Contact Person</label>
+                                <input type="text" :name="'content[contacts_list][' + index + '][contact_person]'"
+                                       x-model="contact.contact_person"
+                                       class="block mt-1 w-full text-sm rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                                @error('content.contacts_list.*.contact_person') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label :for="'contact_email_' + index"
+                                       class="text-sm font-medium text-gray-700 dark:text-gray-300">Contact Email</label>
+                                <input type="email" :name="'content[contacts_list][' + index + '][contact_email]'"
+                                       x-model="contact.contact_email"
+                                       class="block mt-1 w-full text-sm rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                                @error('content.contacts_list.*.contact_email') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <button @click.prevent="addContactItem()" type="button"
+                    class="mt-4 text-sm inline-flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
+                Add Contact
+            </button>
+        </div>
+        {{-- End Suppliers/Retailers Contact List Section --}}
     </div>
 
 
@@ -458,12 +543,13 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('pageForm', (initialData) => ({
-            // --- ADDED THIS LINE ---
             storageBaseUrl: initialData.storageBaseUrl,
-
-            banners: initialData.banners.map(banner => ({...banner, new_image_preview: null})),
-            goodnessList: initialData.goodnessList.map(item => ({...item})), // New repeater data
-            healthyList: initialData.healthyList.map(item => ({...item})), // New repeater data
+            banners: Array.isArray(initialData.banners) ? initialData.banners.map(banner => ({...banner, new_image_preview: null})) : [],
+            goodnessList: Array.isArray(initialData.goodnessList) ? initialData.goodnessList.map(item => ({...item})) : [],
+            healthyList: Array.isArray(initialData.healthyList) ? initialData.healthyList.map(item => ({...item})) : [],
+            // --- ADD THIS LINE ---
+            contactsList: Array.isArray(initialData.contactsList) ? initialData.contactsList.map(item => ({...item})) : [],
+            // --- END ADDED LINE ---
             selectedTemplate: initialData.selectedTemplate,
             info1BgPreview: initialData.info1BgPreview,
             info1BgExisting: initialData.info1BgExisting,
@@ -485,8 +571,11 @@
             birthBgExisting: initialData.birthBgExisting,
             goodnessBgPreview: initialData.goodnessBgPreview,
             goodnessBgExisting: initialData.goodnessBgExisting,
-            healthyBgPreview: initialData.healthyBgPreview, // <-- NEW Preview Init
-            healthyBgExisting: initialData.healthyBgExisting, // <-- NEW Existing Init
+            healthyBgPreview: initialData.healthyBgPreview,
+            healthyBgExisting: initialData.healthyBgExisting,
+            healthyTipsHlBgPreview: initialData.healthyTipsHlBgPreview,
+            healthyTipsHlBgExisting: initialData.healthyTipsHlBgExisting,
+
 
             addBanner() {
                 this.banners.push({image_url: '', title: '', description: '', new_image_preview: null});
@@ -560,12 +649,21 @@
                     this.goodnessBgPreview = URL.createObjectURL(file);
                 }
             },
-
-            addHealthyItem() { this.healthyList.push({text: ''}); }, // <-- NEW Add Item
-            setHealthyBgPreview(event) { // <-- NEW Set Preview
+            addHealthyItem() { this.healthyList.push({text: ''}); },
+            setHealthyBgPreview(event) {
                 const file = event.target.files[0];
                 if (file) { this.healthyBgPreview = URL.createObjectURL(file); }
             },
+            setHealthyTipsHlBgPreview(event) {
+                const file = event.target.files[0];
+                if (file) { this.healthyTipsHlBgPreview = URL.createObjectURL(file); }
+            },
+
+            // --- ADD THIS FUNCTION ---
+            addContactItem() {
+                this.contactsList.push({ company_name: '', contact_person: '', contact_email: '' });
+            },
+            // --- END ADDED FUNCTION ---
         }));
     });
 </script>
