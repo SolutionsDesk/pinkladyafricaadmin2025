@@ -21,13 +21,14 @@
 
                             <div>
                                 <label for="body" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Body</label>
-                                <textarea id="body" name="body" rows="10" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 font-mono">{{ old('body', $healthyLiving->body) }}</textarea>
+                                <textarea id="body" name="body" rows="10" class="block mt-1 w-full rounded-md shadow-sm txt-lg border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 font-mono">{{ old('body', $healthyLiving->body) }}</textarea>
                                 @error('body') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="slug" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Slug</label>
-                                <input type="text" id="slug" value="{{ $healthyLiving->slug }}" disabled class="block mt-1 w-full rounded-md shadow-sm border-gray-300 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+                                <label for="slug" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Article URL</label>
+                                <input type="text" name="article_url" value="{{ old('title', $healthyLiving->title) }}" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+                                @error('article_url') <p class="text-red-500 text-xs mt-2">{{ $article_url }}</p> @enderror
                             </div>
                         </div>
 
