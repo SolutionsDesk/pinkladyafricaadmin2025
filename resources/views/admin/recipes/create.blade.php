@@ -99,7 +99,4 @@
         });
     </script>
 
-    @php
-    echo phpinfo();
-    @endphp
 </x-app-layout>
