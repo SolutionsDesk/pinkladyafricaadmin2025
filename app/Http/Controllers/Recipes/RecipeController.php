@@ -42,7 +42,7 @@ class RecipeController extends Controller
             'content.ingredients.*.ingredient' => 'required|string',
             'content.ingredients.*.type' => 'required|in:ingredient,heading',
             'content.categories' => 'required|array|min:1', // Ensures at least one category is selected
-            'content.categories.*' => 'string|in:mains,starters,desserts,snacks,video',
+            'content.categories.*' => 'string|in:mains,starters,sweet,snacks,video',
         ]);
 
         $content = $request->input('content', []);
@@ -103,7 +103,7 @@ class RecipeController extends Controller
             'content.ingredients.*.type' => 'required|in:ingredient,heading',
             'content.method' => 'nullable|string',
             'content.categories' => 'required|array|min:1', // Ensures at least one category is selected
-            'content.categories.*' => 'string|in:mains,starters,desserts,snacks,video',
+            'content.categories.*' => 'string|in:mains,starters,sweet,snacks,video',
         ]);
 
         $newContent = $request->input('content', []);

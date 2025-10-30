@@ -28,7 +28,7 @@ class PageResource extends JsonResource
 
             // --- RECIPE CASES ---
             case 'recipes_listing':
-            case 'recipes-listing': // Handle both - or - _
+            case 'recipes': // Handle both - or - _
                 // Get ALL recipes
                 $data['recipes'] = RecipeResource::collection(Recipe::latest()->paginate($perPage));
                 break;
