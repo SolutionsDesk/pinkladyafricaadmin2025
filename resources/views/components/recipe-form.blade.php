@@ -103,6 +103,34 @@
             </div>
 
             <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Categories</h3>
+                <div>
+                    <label for="categories" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Select categories</label>
+                    @php
+                        // Define your available categories
+                        $allCategories = [
+                            'mains' => 'Mains',
+                            'starters' => 'Starters',
+                            'sweet' => 'Sweet',
+                            'snacks' => 'Snacks',
+                            'video' => 'Video Recipe'
+                        ];
+                        // Get categories already saved to this recipe
+                        $selectedCategories = old('content.categories', $recipe->content['categories'] ?? []);
+                    @endphp
+
+                    {{-- Use the html() helper to create the multi-select --}}
+                    {{ html()->select('content[categories][]', $allCategories, $selectedCategories)
+                            ->multiple()
+                            ->id('categories')
+                            ->class('block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:bg-gray-900 dark:border-gray-700') }}
+
+                    <p class="text-xs text-gray-500 mt-1">Hold Ctrl (or Cmd on Mac) to select multiple.</p>
+                    @error('content.categories') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div class="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Ingredients</h3>
                 <div class="space-y-2">
                     <template x-for="(item, index) in ingredients" :key="index">

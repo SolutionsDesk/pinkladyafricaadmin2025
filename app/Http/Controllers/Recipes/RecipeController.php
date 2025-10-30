@@ -29,18 +29,20 @@ class RecipeController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content.banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:100048',
             'content.serves' => 'nullable|string',
             'content.cooking_time' => 'nullable|string',
             'content.chef_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
             'content.chef_name' => 'nullable|string',
             'content.chef_website' => 'nullable|url',
-            'content.recipe_pdf' => 'nullable|file|mimes:pdf|max:5120',
-            'content.recipe_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:51200',
+            'content.recipe_pdf' => 'nullable|file|mimes:pdf|max:100120',
+            'content.recipe_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:100200',
             'content.video_name' => 'nullable|string',
             'content.ingredients' => 'nullable|array',
             'content.ingredients.*.ingredient' => 'required|string',
             'content.ingredients.*.type' => 'required|in:ingredient,heading',
+            'content.categories' => 'required|array|min:1', // Ensures at least one category is selected
+            'content.categories.*' => 'string|in:mains,starters,desserts,snacks,video',
         ]);
 
         $content = $request->input('content', []);
@@ -87,19 +89,21 @@ class RecipeController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content.banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'content.banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:100048',
             'content.serves' => 'nullable|string',
             'content.cooking_time' => 'nullable|string',
             'content.chef_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
             'content.chef_name' => 'nullable|string',
             'content.chef_website' => 'nullable|url',
-            'content.recipe_pdf' => 'nullable|file|mimes:pdf|max:5120',
-            'content.recipe_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:51200',
+            'content.recipe_pdf' => 'nullable|file|mimes:pdf|max:100120',
+            'content.recipe_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:100200',
             'content.video_name' => 'nullable|string',
             'content.ingredients' => 'nullable|array',
             'content.ingredients.*.ingredient' => 'required|string',
             'content.ingredients.*.type' => 'required|in:ingredient,heading',
             'content.method' => 'nullable|string',
+            'content.categories' => 'required|array|min:1', // Ensures at least one category is selected
+            'content.categories.*' => 'string|in:mains,starters,desserts,snacks,video',
         ]);
 
         $newContent = $request->input('content', []);
