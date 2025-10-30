@@ -32,7 +32,7 @@ class PageResource extends JsonResource
                 // Get ALL recipes
                 $data['recipes'] = RecipeResource::collection(Recipe::latest()->paginate($perPage));
                 break;
-            case 'recipe-started':
+            case 'recipes-started':
                 // Get recipes in 'mains' category
                 $data['recipes'] = RecipeResource::collection(
                     Recipe::whereJsonContains('content->categories', 'starters')
